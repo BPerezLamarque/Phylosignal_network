@@ -42,6 +42,8 @@ install_github("hmorlon/PANDA",ref="Benoit_phylosignal", dependencies = TRUE)
 
 <p align="center">
     <img src="https://github.com/BPerezLamarque/Phylosignal_network/blob/master/example/figures.png" width="500">
+</p>
+<p align="center">
     <b>A toy example of an interaction network between orchids (in green) and mycorrhizal fungi (in brown) informed with the phylogenetic trees of each guild.</b>
 </p>
 
