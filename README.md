@@ -131,7 +131,7 @@ phylosignal_network(network, tree_orchids, method = "degree", correlation = "Pea
 The output of  `phylosignal_network` is then:
 
 | nb_A | nb_B | mantel_cor_A | pvalue_high_A | pvalue_low_A | 
-| --- | --- | --- | --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | 70 | 93 | 0.02 | 0.34 | 0.66  |
 
 which corresponds the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), and the Mantel correlation between phylogenetic distances and degree difference distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_high_A**), its associated lower p-value (**pvalue_low_A**).
@@ -147,7 +147,40 @@ Thus, here we do not detect any significant phylogenetic signal in degrees of ge
 ## Option 1: investigate clade-specific phylogenetic signals (simple Mantel tests with Bonferroni correction)
 
 
-phylosignal_sub_network(network, tree_A, tree_B, method = "GUniFrac", correlation = "Pearson")
+
+
+This first option uses the function  `phylosignal_sub_network` to  compute the clade-specific phylogenetic signals in species interactions. For each node of the tree A having a certain number of descending species, it computes the phylogenetic signal in the resulting sub-network by performing a Mantel test between the phylogenetic distances and the ecological distances for the given sub-clade of tree A. Mantel tests can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances. The results of the clade-specific phylogenetic signal analysis can be represented using the function  `plot_phylosignal_sub_network`.
+
+
+| Option | Description |
+| --- | --- |
+| `network` | a matrix representing the ecological interaction network with species from guild A in columns and species from guild B in rows. |
+| `tree_A` | a phylogenetic tree of the guild A (the columns of the interaction network). |
+| `tree_B` | a phylogenetic tree of the guild B (the rows of the interaction network). |
+| `method` | indicates which method is used to compute the phylogenetic signal in species interactions: you can choose "Jaccard_weighted" for computing ecological distances using Jaccard dissimilarities (or "Jaccard_binary" to not take into account the abundances of the interactions), or "GUniFrac" to compute the generalized UniFrac distances (or "UniFrac_unweighted" to not take into account the interaction abundances). |
+| `correlation` |indicates which correlation is used in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
+| `nperm` | number of permutations to evaluate the significance of the Mantel test.  |
+| `minimum` | indicates the minimal number of descending species for a node in tree A to compute its clade-specific phylogenetic signal.  |
+
+
+```r
+
+# compute clade-specific phylogenetic signals in species intercations for orchids
+
+results_clade_A <- phylosignal_sub_network(network, tree_orchids, tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=100000, minimum=10)
+
+plot_phylosignal_sub_network(tree_orchids, results_clade_A)
+
+```
+
+
+The output of  `phylosignal_sub_network` corresponds to a table where each line corresponds to a tested clade and which contains 8 columns: the name of the node (*node*), the number of species in the sub-clade A (*nb_A*), the number of species in guild B associated with the sub-clade A (*nb_B*), the Mantel correlation for guild A (*mantel_cor*), its associated upper p-value (*pvalue_high*), its associated lower p-value (*pvalue_low*), and the corresponding Bonferroni corrected p-values (*pvalue_high_corrected* and *pvalue_low_corrected*).
+
+The representation of the results using `plot_phylosignal_sub_network` is a phylogenetic tree with nodes colored according to the clade-specific phylogenetic signals. Blue nodes are not significant (based in the Bonferonni correction), grey nodes are not tested (less than  `minimum` descending tips), and orange-red nodes represent significant phylogenetic signals and their color indicates the strenght of the correlation.
+
+
+<br> <br>
+
 
 
 ## Option 2: test the robustness of the findings to phylogenetic uncertainty and/or sampling bias
