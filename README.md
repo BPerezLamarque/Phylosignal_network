@@ -1,11 +1,11 @@
 
-**Guidelines to measure phylogenetic signal in species interactions in a bipartite ecological network:**
+**Guidelines to measure phylogenetic signal in a bipartite interaction network:**
 ====
 
 
 
 
-This document indicates how to measure phylogenetic signal in species interactions in a bipartite ecological network using the R-package RPANDA (Morlon *et al.*, 2016).
+This document indicates how to measure phylogenetic signal in a bipartite ecological network using the R-package RPANDA (Morlon *et al.*, 2016), *i.e.* to measure whether closely related species interact with similar partners.
 
 
 **Citation:** Benoît Perez-Lamarque, Odile Maliet, Marc-André Selosse, Florent Martos, and Hélène Morlon, (*in prep.*)
