@@ -9,7 +9,7 @@ This document indicates how to measure phylogenetic signal in a bipartite ecolog
 
 
 **Citation:** Benoît Perez-Lamarque, Odile Maliet, Marc-André Selosse, Florent Martos, and Hélène Morlon, (*in prep.*)
-**Do closely related species interact with similar partners? Testing for phylogenetic signal in ecological networks**.
+*Do closely related species interact with similar partners? Testing for phylogenetic signal in ecological networks*.
 
 
 **Contact:** Benoît Perez-Lamarque, benoit.perez.lamarque@gmail.com
@@ -18,7 +18,7 @@ This document indicates how to measure phylogenetic signal in a bipartite ecolog
 # Contents:
 **[Installation](#installation)**\
 **[Measuring phylogenetic signal](#measuring-phylogenetic-signal)**\
-**[Optionnal steps](#optionnal-steps):**
+**[Optionnal steps](#optionnal-steps)**
 
 
 
@@ -82,8 +82,7 @@ This first step uses the function  `phylosignal_network` to compute the phylogen
 | `correlation` |indicates which correlation is used in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
 | `nperm` | number of permutations to evaluate the significance of the Mantel test.  |
 
-
-
+<br> <br>
 ```r
 
 # compute phylogenetic signals in species intercations
@@ -117,11 +116,10 @@ This second step also uses the function  `phylosignal_network` to compute the ph
 | `correlation` |indicates which correlation is used in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
 | `nperm` | number of permutations to evaluate the significance of the Mantel test.  |
 
-
+<br> <br>
 ```r
 
 # compute the phylogenetic signal in degrees of generalism for orchids 
-
 phylosignal_network(network, tree_orchids, method = "degree", correlation = "Pearson", nperm=10000)
 
 
@@ -162,9 +160,8 @@ This first option uses the function  `phylosignal_sub_network` to  compute the c
 | `nperm` | number of permutations to evaluate the significance of the Mantel test.  |
 | `minimum` | indicates the minimal number of descending species for a node in tree A to compute its clade-specific phylogenetic signal.  |
 
-
+<br> <br>
 ```r
-
 # compute clade-specific phylogenetic signals in species intercations for orchids
 
 results_clade_A <- phylosignal_sub_network(network, tree_orchids, tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=100000, minimum=10)
