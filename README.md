@@ -48,9 +48,7 @@ install_github("hmorlon/PANDA",ref="Benoit_phylosignal", dependencies = TRUE)
     <b>A toy example of an interaction network between orchids (in green) and mycorrhizal fungi (in brown) informed with the phylogenetic trees of each guild.</b>
 </p>
 
-<br> <br>
-
-First, load the example dataset of a mycorrhizal network between orchids and mycorrhizal fungi from La Réunion island (Martos *et al.*, 2012) along with the reconstructed phylogenetic trees of the orchids and the fungal OTUs:
+First, you can load the example dataset of a mycorrhizal network between orchids and mycorrhizal fungi from La Réunion island (Martos *et al.*, 2012) along with the reconstructed phylogenetic trees of the orchids and the fungal OTUs:
 
 
 ```r
@@ -98,14 +96,14 @@ The output of  `phylosignal_network` is:
 
  which corresponds the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), the Mantel correlation  between phylogenetic distances and ecological distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_high_A**), its associated lower p-value (**pvalue_low_A**), and  the Mantel correlation between phylogenetic distances and ecological distances for fungi (**mantel_cor_B**), its associated upper p-value (**pvalue_high_B**), abd its associated lower p-value (**pvalue_low_B**),
 
-Thus, here we do not detect any significant phylogenetic signal in species interactions between the orchids and their mycorrhizal fungi. 
+Thus, here we do not detect any significant phylogenetic signal in species interactions between the orchids and their mycorrhizal fungi (p-values>0.05). 
 
 <br> <br>
 
 ##  Step 2: Testing for degrees of generalism
 
 
-This second step also uses the function  `phylosignal_network` to compute the phylogenetic signal in degrees of generalism (do closely related species interact with the same number of partners?) using a simple Mantel test:
+This second step also uses the function  `phylosignal_network` to compute the phylogenetic signal in degrees of generalism (do closely related species interact with the same number of partners?) using a simple Mantel test. The goal of this step is especially to verify, if there is s significant phylogenetic signal in species interactions (step 1), whether this step can be caused by a phylogenetic signal in degrees of generalism, rather than in the identity of the interacting species.
 
 ```r
 
@@ -132,7 +130,8 @@ The output of  `phylosignal_network` is then:
 
 which corresponds the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), and the Mantel correlation between phylogenetic distances and degree difference distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_high_A**), its associated lower p-value (**pvalue_low_A**).
 
-Thus, here we do not detect any significant phylogenetic signal in degrees of generalism for the orchids.
+Thus, here we do not detect any significant phylogenetic signal in degrees of generalism for the orchids (p-value>0.05). 
+
 
 
 <br> <br>
