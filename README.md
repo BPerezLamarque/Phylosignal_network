@@ -73,6 +73,7 @@ tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
 The function  `phylosignal_network` computes the phylogenetic signal in species interactions (do closely related species interact with similar partners?) using a simple Mantel test or the phylogenetic signal in the degree of generalism (do closely related species interact with the same number of partners?). Mantel tests measuring phylogenetic signal in species interactions can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances.
 
 | function  |  `phylosignal_network` |
+| --- | --- |
 | Option | Description |
 | --- | --- |
 | `network` | a matrix representing the ecological interaction network with species from guild A in columns and species from guild B in rows. |
