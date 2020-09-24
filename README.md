@@ -18,7 +18,7 @@ This document indicates how to measure phylogenetic signal in species interactio
 # Contents:
 **[Installation](#installation)**\
 **[Measuring phylogenetic signal](#measuring-phylogenetic-signal)**\
-**[Optionnal validations](#optionnal-validations):**
+**[Optionnal steps](#optionnal-steps):**
 
 
 
@@ -64,7 +64,7 @@ tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
 
 ```
 
-
+<br> <br>
 
 
 ##  Step 1: Testing for phylogenetic signal in the species interactions (Mantel test)
@@ -78,7 +78,7 @@ This first step uses the function  `phylosignal_network` to compute the phylogen
 | `network` | a matrix representing the ecological interaction network with species from guild A in columns and species from guild B in rows. |
 | `tree_A` | a phylogenetic tree of the guild A (the columns of the interaction network). |
 | `tree_B` | a phylogenetic tree of the guild B (the rows of the interaction network). |
-| `method` | indicates which method is used to compute the phylogenetic signal in species interactions: you can choose "Jaccard_weighted" for computing ecological distances using Jaccard dissimilarities (or "Jaccard_binary" to not take into account the abundances of the interactions), or "GUniFrac" to compute the generalized UniFrac distances ("UniFrac_unweighted" to not take into account the interaction abundances). |
+| `method` | indicates which method is used to compute the phylogenetic signal in species interactions: you can choose "Jaccard_weighted" for computing ecological distances using Jaccard dissimilarities (or "Jaccard_binary" to not take into account the abundances of the interactions), or "GUniFrac" to compute the generalized UniFrac distances (or "UniFrac_unweighted" to not take into account the interaction abundances). |
 | `correlation` |indicates which correlation is used in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
 | `nperm` | number of permutations to evaluate the significance of the Mantel test.  |
 
@@ -140,4 +140,17 @@ which corresponds the number of orchid species (**nb_A**), the number of fungal 
 Thus, here we do not detect any significant phylogenetic signal in degrees of generalism for the orchids. 
 
 
-# Optionnal validations:
+<br> <br>
+
+
+# Optionnal steps:
+
+## Option 1: investigate clade-specific phylogenetic signals (simple Mantel tests with Bonferroni correction)
+
+
+phylosignal_sub_network(network, tree_A, tree_B, method = "GUniFrac", correlation = "Pearson")
+
+
+## Option 2: test the robustness of the findings to phylogenetic uncertainty and/or sampling bias
+
+This can be achieved by testing the robustness of the results to phylogenetic uncertainty (using a Bayesian posterior of tree, by investigating the influence of polytomy…) or sampling bias (by subsampling over-represented species/clades). See Perez-Lamarque *et al.* (*in prep.*) for more details.
