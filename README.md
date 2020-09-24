@@ -139,12 +139,10 @@ Thus, here we do not detect any significant phylogenetic signal in degrees of ge
 
 # Optional steps:
 
-## Option 1: investigate clade-specific phylogenetic signals (simple Mantel tests with Bonferroni correction)
+## Option 1: Investigate clade-specific phylogenetic signals
 
 
-
-
-This first option uses the function  `phylosignal_sub_network` to  compute the clade-specific phylogenetic signals in species interactions. For each node of the tree A having a certain number of descending species, it computes the phylogenetic signal in the resulting sub-network by performing a Mantel test between the phylogenetic distances and the ecological distances for the given sub-clade of tree A. Mantel tests can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances. The results of the clade-specific phylogenetic signal analysis can be represented using the function  `plot_phylosignal_sub_network`.
+This first option uses the function  `phylosignal_sub_network` to  compute the clade-specific phylogenetic signals in species interactions using simple Mantel tests with Bonferroni correction. For each node of the tree A having a certain number of descending species, it computes the phylogenetic signal in the resulting sub-network by performing a Mantel test between the phylogenetic distances and the ecological distances for the given sub-clade of tree A. Mantel tests can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances. The results of the clade-specific phylogenetic signal analysis can be represented using the function  `plot_phylosignal_sub_network`.
 
 ```r
 # compute clade-specific phylogenetic signals in species interactions for orchids
@@ -176,6 +174,6 @@ The representation of the results using `plot_phylosignal_sub_network` is a phyl
 
 
 
-## Option 2: test the robustness of the findings to phylogenetic uncertainty and/or sampling bias
+## Option 2: Test the robustness of the findings to phylogenetic uncertainty and/or sampling bias
 
 This can be achieved by testing the robustness of the results to phylogenetic uncertainty (using a Bayesian tree posterior, by investigating the influence of polytomy…) or sampling bias (by subsampling over-represented species/clades). See Perez-Lamarque *et al.* (*in prep.*) for more details.
