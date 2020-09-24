@@ -67,7 +67,7 @@ tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
 <br> <br>
 
 
-##  Step 1: Testing for phylogenetic signal in the species interactions (Mantel test)
+##  Step 1: Testing for phylogenetic signal in the species interactions
 
 
 This first step uses the function  `phylosignal_network` to compute the phylogenetic signal in species interactions (do closely related species interact with similar partners?) using a simple Mantel test or the phylogenetic signal in the degree of generalism (do closely related species interact with the same number of partners?). Mantel tests measuring phylogenetic signal in species interactions can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances.
@@ -102,10 +102,10 @@ Thus, here we do not detect any significant phylogenetic signal in species inter
 
 <br> <br>
 
-##  Step 2: Testing for degrees of generalism (Mantel test)
+##  Step 2: Testing for degrees of generalism
 
 
-This second step also uses the function  `phylosignal_network` to compute the phylogenetic signal in degrees of generalism (do closely related species interact with the same number of partners?)
+This second step also uses the function  `phylosignal_network` to compute the phylogenetic signal in degrees of generalism (do closely related species interact with the same number of partners?) using a simple Mantel test:
 
 ```r
 
@@ -132,7 +132,7 @@ The output of  `phylosignal_network` is then:
 
 which corresponds the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), and the Mantel correlation between phylogenetic distances and degree difference distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_high_A**), its associated lower p-value (**pvalue_low_A**).
 
-Thus, here we do not detect any significant phylogenetic signal in degrees of generalism for the orchids. 
+Thus, here we do not detect any significant phylogenetic signal in degrees of generalism for the orchids.
 
 
 <br> <br>
