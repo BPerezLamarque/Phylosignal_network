@@ -43,10 +43,12 @@ install_github("hmorlon/PANDA",ref="Benoit_phylosignal", dependencies = TRUE)
 <p align="center">
     <img src="https://github.com/BPerezLamarque/Phylosignal_network/blob/master/example/figures.png" width="500">
 </p>
+
 <p align="center">
     <b>A toy example of an interaction network between orchids (in green) and mycorrhizal fungi (in brown) informed with the phylogenetic trees of each guild.</b>
 </p>
 
+<b></b>
 
 First, load the example dataset of a mycorrhizal network between orchids and mycorrhizal fungi from La Réunion island (Martos *et al.*, 2012) along with the reconstructed phylogenetic trees of the orchids and the fungal OTUs:
 
@@ -70,14 +72,11 @@ tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
 
 The following function computes the phylogenetic signal in species interactions (do closely related species interact with similar partners?) using a simple Mantel test or the phylogenetic signal in the degree of generalism (do closely related species interact with the same number of partners?). Mantel tests measuring phylogenetic signal in species interactions can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances.
 
-
-<dl>
-  <dt>Coffee</dt>
-  <dd>- black hot drink</dd>
-  <dt>Milk</dt>
-  <dd>- white cold drink</dd>
-</dl>
-
+| function `phylosignal_network` |
+| Command | Description |
+| --- | --- |
+| `git status` | List all *new or modified* files |
+| `git diff` | Show file differences that **haven't been** staged |
 
 
 
