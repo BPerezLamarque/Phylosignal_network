@@ -102,8 +102,7 @@ The output of  `phylosignal_network` is:
 
 Thus, here we do not detect any significant phylogenetic signal in species interactions between the orchids and their mycorrhizal fungi. 
 
-
-
+<br> <br>
 
 ##  Step 2: Testing for degrees of generalism (Mantel test)
 
