@@ -1,11 +1,11 @@
 
-**Guidelines to measure phylogenetic signal in a bipartite interaction network:**
+**Guidelines to measure the phylogenetic signal in a bipartite interaction network:**
 ====
 
 
 
 
-This document indicates how to measure phylogenetic signal in a bipartite ecological network using the R-package RPANDA (Morlon *et al.*, 2016), *i.e.* to measure whether closely related species interact with similar partners.
+This document indicates how to measure the phylogenetic signal in a bipartite ecological network using the R-package RPANDA (Morlon *et al.*, 2016), *i.e.* to measure whether closely related species interact with similar partners.
 
 
 **Citation:** Benoît Perez-Lamarque, Odile Maliet, Marc-André Selosse, Florent Martos, and Hélène Morlon, (*in prep.*)
@@ -17,8 +17,8 @@ This document indicates how to measure phylogenetic signal in a bipartite ecolog
 
 # Contents:
 **[Installation](#installation)**\
-**[Measuring phylogenetic signal](#measuring-phylogenetic-signal)**\
-**[Optionnal steps](#optionnal-steps)**
+**[Measuring the phylogenetic signal](#measuring-phylogenetic-signal)**\
+**[Optional steps](#optional-steps)**
 
 
 
@@ -37,7 +37,7 @@ install_github("hmorlon/PANDA",ref="Benoit_phylosignal", dependencies = TRUE)
 
 
 
-# Measuring phylogenetic signal:
+# Measuring the phylogenetic signal:
 
 
 <p align="center">
@@ -65,7 +65,7 @@ tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
 <br> <br>
 
 
-##  Step 1: Testing for phylogenetic signal in the species interactions
+##  Step 1: Testing for the phylogenetic signal in the species interactions
 
 
 This first step uses the function  `phylosignal_network` to compute the phylogenetic signal in species interactions (do closely related species interact with similar partners?) using a simple Mantel test or the phylogenetic signal in the degree of generalism (do closely related species interact with the same number of partners?). Mantel tests measuring phylogenetic signal in species interactions can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances.
@@ -100,10 +100,10 @@ Thus, here we do not detect any significant phylogenetic signal in species inter
 
 <br> <br>
 
-##  Step 2: Testing for degrees of generalism
+##  Step 2: Testing for the phylogenetic signal in degrees of generalism
 
 
-This second step also uses the function  `phylosignal_network` to compute the phylogenetic signal in degrees of generalism (do closely related species interact with the same number of partners?) using a simple Mantel test. The goal of this step is especially to verify, if there is s significant phylogenetic signal in species interactions (step 1), whether this step can be caused by a phylogenetic signal in degrees of generalism, rather than in the identity of the interacting species.
+This second step also uses the function  `phylosignal_network` to compute the phylogenetic signal in degrees of generalism (do closely related species interact with the same number of partners?) using a simple Mantel test. The goal of this step is especially to verify if there is s significant phylogenetic signal in species interactions (step 1), whether this step can be caused by a phylogenetic signal in degrees of generalism, rather than in the identity of the interacting species.
 
 ```r
 
@@ -128,7 +128,7 @@ The output of  `phylosignal_network` is then:
 | --- | --- | --- | --- | --- |
 | 70 | 93 | 0.02 | 0.34 | 0.66  |
 
-which corresponds the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), and the Mantel correlation between phylogenetic distances and degree difference distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_high_A**), its associated lower p-value (**pvalue_low_A**).
+which corresponds to the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), and the Mantel correlation between phylogenetic distances and degree difference distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_high_A**), its associated lower p-value (**pvalue_low_A**).
 
 Thus, here we do not detect any significant phylogenetic signal in degrees of generalism for the orchids (p-value>0.05). 
 
@@ -137,7 +137,7 @@ Thus, here we do not detect any significant phylogenetic signal in degrees of ge
 <br> <br>
 
 
-# Optionnal steps:
+# Optional steps:
 
 ## Option 1: investigate clade-specific phylogenetic signals (simple Mantel tests with Bonferroni correction)
 
@@ -147,7 +147,7 @@ Thus, here we do not detect any significant phylogenetic signal in degrees of ge
 This first option uses the function  `phylosignal_sub_network` to  compute the clade-specific phylogenetic signals in species interactions. For each node of the tree A having a certain number of descending species, it computes the phylogenetic signal in the resulting sub-network by performing a Mantel test between the phylogenetic distances and the ecological distances for the given sub-clade of tree A. Mantel tests can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances. The results of the clade-specific phylogenetic signal analysis can be represented using the function  `plot_phylosignal_sub_network`.
 
 ```r
-# compute clade-specific phylogenetic signals in species intercations for orchids
+# compute clade-specific phylogenetic signals in species interactions for orchids
 
 results_clade_A <- phylosignal_sub_network(network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=100000, minimum=10)
 
@@ -169,7 +169,7 @@ plot_phylosignal_sub_network(tree_A = tree_orchids, results_clade_A)
 
 The output of  `phylosignal_sub_network` corresponds to a table where each line corresponds to a tested clade and which contains 8 columns: the name of the node (*node*), the number of species in the sub-clade A (*nb_A*), the number of species in guild B associated with the sub-clade A (*nb_B*), the Mantel correlation for guild A (*mantel_cor*), its associated upper p-value (*pvalue_high*), its associated lower p-value (*pvalue_low*), and the corresponding Bonferroni corrected p-values (*pvalue_high_corrected* and *pvalue_low_corrected*).
 
-The representation of the results using `plot_phylosignal_sub_network` is a phylogenetic tree with nodes colored according to the clade-specific phylogenetic signals. Blue nodes are not significant (based in the Bonferonni correction), grey nodes are not tested (less than  `minimum` descending tips), and orange-red nodes represent significant phylogenetic signals and their color indicates the strenght of the correlation.
+The representation of the results using `plot_phylosignal_sub_network` is a phylogenetic tree with nodes colored according to the clade-specific phylogenetic signals. Blue nodes are not significant (based in the Bonferonni correction), grey nodes are not tested (less than  `minimum` descending tips), and orange-red nodes represent significant phylogenetic signals and their color indicates the strength of the correlation.
 
 
 <br> <br>
@@ -178,4 +178,4 @@ The representation of the results using `plot_phylosignal_sub_network` is a phyl
 
 ## Option 2: test the robustness of the findings to phylogenetic uncertainty and/or sampling bias
 
-This can be achieved by testing the robustness of the results to phylogenetic uncertainty (using a Bayesian posterior of tree, by investigating the influence of polytomy…) or sampling bias (by subsampling over-represented species/clades). See Perez-Lamarque *et al.* (*in prep.*) for more details.
+This can be achieved by testing the robustness of the results to phylogenetic uncertainty (using a Bayesian tree posterior, by investigating the influence of polytomy…) or sampling bias (by subsampling over-represented species/clades). See Perez-Lamarque *et al.* (*in prep.*) for more details.
