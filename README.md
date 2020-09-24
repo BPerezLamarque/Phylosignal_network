@@ -98,7 +98,7 @@ The output of  `phylosignal_network` is:
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 70 | 93 | -0.03 | 0.66 | 0.34  | 0.01  | 0.22 | 0.78 |
 
- which corresponds the number of orchid species ("nb_A"), the number of fungal species ("nb_B"), the Mantel correlation for orchids ("mantel_cor_A"), its associated upper p-value ("pvalue_high_A"), its associated lower p-value ("pvalue_low_A"), and  the Mantel correlation for fungi ("mantel_cor_B"), its associated upper p-value ("pvalue_high_B"), abd its associated lower p-value ("pvalue_low_B"),
+ which corresponds the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), the Mantel correlation for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_high_A**), its associated lower p-value (**pvalue_low_A**), and  the Mantel correlation for fungi (**mantel_cor_B**), its associated upper p-value (**pvalue_high_B**), abd its associated lower p-value (**pvalue_low_B**),
 
 Thus, here we do not detect any phylogenetic signal in species interactions. 
 
