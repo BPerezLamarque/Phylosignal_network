@@ -58,7 +58,7 @@ library(RPANDA)
 
 data(mycorrhizal_network)
 
-network <- mycorrhizal_network[[1]] # interaction matrix 
+network <- mycorrhizal_network[[1]] # interaction matrix with orchids in columns and fungi in rows
 tree_orchids <- mycorrhizal_network[[2]] # phylogenetic tree (phylo object)
 tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
 
@@ -67,25 +67,38 @@ tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
 
 
 
-##  Step 1: test the phylogenetic signal in the species interactions (Mantel test)
+##  Step 1: Test for phylogenetic signal in the species interactions (Mantel test)
 
 
-The following function computes the phylogenetic signal in species interactions (do closely related species interact with similar partners?) using a simple Mantel test or the phylogenetic signal in the degree of generalism (do closely related species interact with the same number of partners?). Mantel tests measuring phylogenetic signal in species interactions can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances.
+The function  `phylosignal_network` computes the phylogenetic signal in species interactions (do closely related species interact with similar partners?) using a simple Mantel test or the phylogenetic signal in the degree of generalism (do closely related species interact with the same number of partners?). Mantel tests measuring phylogenetic signal in species interactions can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances.
 
-| function `phylosignal_network` |
-| Command | Description |
+| function  |  `phylosignal_network` |
+| Option | Description |
 | --- | --- |
-| `git status` | List all *new or modified* files |
-| `git diff` | Show file differences that **haven't been** staged |
-
+| `network` | a matrix representing the ecological interaction network with species from guild A in columns and species from guild B in rows. |
+| `tree_A` | a phylogenetic tree of the guild A (the columns of the interaction network). |
+| `tree_B` | a phylogenetic tree of the guild B (the rows of the interaction network). |
+| `method` | indicates which method is used to compute the phylogenetic signal in species interactions: you can choose "Jaccard_weighted" for computing ecological distances using Jaccard dissimilarities (or "Jaccard_binary" to not take into account the abundances of the interactions), or "GUniFrac" to compute the generalized UniFrac distances ("UniFrac_unweighted" to not take into account the interaction abundances). |
+| `correlation` |indicates which correlation is used in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
+| `nperm` | number of permutations to evaluate the significance of the Mantel test.  |
 
 
 ```r
 
 # compute the phylogenetic signal in species intercations for orchids 
-phylosignal_network(network, tree_orchids, tree_fungi, method = "GUniFrac", correlation = "Pearson")
+phylosignal_network(network, tree_orchids, tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=10000)
 
 ```
+
+The output of  `phylosignal_network` is:
+
+| nb_A | nb_B | mantel_cor_A | pvalue_high_A | pvalue_low_A | mantel_cor_B | pvalue_high_B | pvalue_low_B |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 70 | 93 | -0.03 | 0.66 | 0.34  | 0.01  | 0.22 | 0.78 |
+
+ which corresponds the number of orchid species ("nb_A"), the number of fungal species ("nb_B"), the Mantel correlation for orchids ("mantel_cor_A"), its associated upper p-value ("pvalue_high_A"), its associated lower p-value ("pvalue_low_A"), and  the Mantel correlation for fungi ("mantel_cor_B"), its associated upper p-value ("pvalue_high_B"), abd its associated lower p-value ("pvalue_low_B"),
+
+Thus, here we do not detect any phylogenetic signal in species interactions. 
 
 
 
