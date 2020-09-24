@@ -49,6 +49,7 @@ install_github("hmorlon/PANDA",ref="Benoit_phylosignal", dependencies = TRUE)
 </p>
 
 <b></b>
+<br><br>
 
 First, load the example dataset of a mycorrhizal network between orchids and mycorrhizal fungi from La Réunion island (Martos *et al.*, 2012) along with the reconstructed phylogenetic trees of the orchids and the fungal OTUs:
 
@@ -72,8 +73,8 @@ tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
 
 The function  `phylosignal_network` computes the phylogenetic signal in species interactions (do closely related species interact with similar partners?) using a simple Mantel test or the phylogenetic signal in the degree of generalism (do closely related species interact with the same number of partners?). Mantel tests measuring phylogenetic signal in species interactions can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances.
 
-| function  |  `phylosignal_network` |
-| --- | --- |
+<br><br>
+
 | Option | Description |
 | --- | --- |
 | `network` | a matrix representing the ecological interaction network with species from guild A in columns and species from guild B in rows. |
@@ -83,6 +84,8 @@ The function  `phylosignal_network` computes the phylogenetic signal in species 
 | `correlation` |indicates which correlation is used in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
 | `nperm` | number of permutations to evaluate the significance of the Mantel test.  |
 
+<br><br>
+
 
 ```r
 
@@ -90,6 +93,8 @@ The function  `phylosignal_network` computes the phylogenetic signal in species 
 phylosignal_network(network, tree_orchids, tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=10000)
 
 ```
+
+<br><br>
 
 The output of  `phylosignal_network` is:
 
