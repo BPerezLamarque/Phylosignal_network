@@ -82,7 +82,7 @@ phylosignal_network(network, tree_A = tree_orchids, tree_B = tree_fungi, method 
 | `network` | a matrix representing the ecological interaction network with species from guild A in columns and species from guild B in rows. |
 | `tree_A` | a phylogenetic tree of the guild A (the columns of the interaction network). |
 | `tree_B` | a phylogenetic tree of the guild B (the rows of the interaction network). |
-| `method` | indicates which method is used to compute the phylogenetic signal in species interactions: you can choose "Jaccard_weighted" for computing ecological distances using Jaccard dissimilarities (or "Jaccard_binary" to not take into account the abundances of the interactions), or "GUniFrac" to compute the generalized UniFrac distances (or "UniFrac_unweighted" to not take into account the interaction abundances). |
+| `method` | indicates which method is used to compute the phylogenetic signal in species interactions: you can choose "Jaccard_weighted" for computing ecological distances using Jaccard dissimilarities (or "Jaccard_binary" to not take into account the abundances of the interactions), or "GUniFrac" to compute the weighted (or generalized) UniFrac distances (or "UniFrac_unweighted" to not take into account the interaction abundances). |
 | `correlation` |indicates which correlation is used in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
 | `nperm` | number of permutations to evaluate the significance of the Mantel test.  |
 
@@ -158,7 +158,7 @@ plot_phylosignal_sub_network(tree_A = tree_orchids, results_clade_A)
 | `network` | a matrix representing the ecological interaction network with species from guild A in columns and species from guild B in rows. |
 | `tree_A` | a phylogenetic tree of the guild A (the columns of the interaction network). |
 | `tree_B` | a phylogenetic tree of the guild B (the rows of the interaction network). |
-| `method` | indicates which method is used to compute the phylogenetic signal in species interactions: you can choose "Jaccard_weighted" for computing ecological distances using Jaccard dissimilarities (or "Jaccard_binary" to not take into account the abundances of the interactions), or "GUniFrac" to compute the generalized UniFrac distances (or "UniFrac_unweighted" to not take into account the interaction abundances). |
+| `method` | indicates which method is used to compute the phylogenetic signal in species interactions: you can choose "Jaccard_weighted" for computing ecological distances using Jaccard dissimilarities (or "Jaccard_binary" to not take into account the abundances of the interactions), or "GUniFrac" to compute the weighted (or generalized) UniFrac distances (or "UniFrac_unweighted" to not take into account the interaction abundances). |
 | `correlation` |indicates which correlation is used in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
 | `nperm` | number of permutations to evaluate the significance of the Mantel test.  |
 | `minimum` | indicates the minimal number of descending species for a node in tree A to compute its clade-specific phylogenetic signal.  |
