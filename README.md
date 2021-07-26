@@ -5,7 +5,7 @@
 
 
 
-This document indicates how to measure the phylogenetic signal in a bipartite ecological network using the R-package RPANDA (Morlon *et al.*, 2016), *i.e.* to measure whether closely related species interact with similar partners.
+This tutorial explains how to measure the phylogenetic signal in species interactions in a bipartite ecological network using the R-package RPANDA (Morlon *et al.*, 2016), *i.e.* to test whether closely related species interact with similar partners.
 
 
 **Citation:** Benoît Perez-Lamarque, Odile Maliet, Marc-André Selosse, Florent Martos, and Hélène Morlon, (*in prep.*)
@@ -13,6 +13,9 @@ This document indicates how to measure the phylogenetic signal in a bipartite ec
 
 
 **Contact:** Benoît Perez-Lamarque, benoit.perez.lamarque@gmail.com
+
+
+Simulations used to investigate the performances of the different approaches to measure phylogenetic signal in species interactions in bipartite ecological networks are available in the folder "simulations" with an associated README.
 
 
 # Contents:
@@ -72,7 +75,7 @@ This first step uses the function  `phylosignal_network` to compute the phylogen
 
 ```r
 
-# compute phylogenetic signals in species intercations
+# compute phylogenetic signals in species interactions
 phylosignal_network(network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=10000)
 
 ```
@@ -100,14 +103,14 @@ Thus, here we do not detect any significant phylogenetic signal in species inter
 
 <br> <br>
 
-##  Step 2: Testing for the phylogenetic signal in degrees of generalism
+##  Step 2: Testing for the phylogenetic signal in the degree of generalism
 
 
-This second step also uses the function  `phylosignal_network` to compute the phylogenetic signal in degrees of generalism (do closely related species interact with the same number of partners?) using a simple Mantel test. The goal of this step is especially to verify if there is s significant phylogenetic signal in species interactions (step 1), whether this step can be caused by a phylogenetic signal in degrees of generalism, rather than in the identity of the interacting species.
+This second step also uses the function  `phylosignal_network` to compute the phylogenetic signal in the degree of generalism (do closely related species interact with the same number of partners?) using a simple Mantel test. The goal of this step is especially to verify if there is s significant phylogenetic signal in species interactions (step 1), whether this step can be caused by a phylogenetic signal in the degree of generalism, rather than in the identity of the interacting species.
 
 ```r
 
-# compute the phylogenetic signal in degrees of generalism for orchids 
+# compute the phylogenetic signal in the degree of generalism for orchids 
 phylosignal_network(network, tree_A = tree_orchids, method = "degree", correlation = "Pearson", nperm=10000)
 
 
@@ -130,7 +133,7 @@ The output of  `phylosignal_network` is then:
 
 which corresponds to the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), and the Mantel correlation between phylogenetic distances and degree difference distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_high_A**), its associated lower p-value (**pvalue_low_A**).
 
-Thus, here we do not detect any significant phylogenetic signal in degrees of generalism for the orchids (p-value>0.05). 
+Thus, here we do not detect any significant phylogenetic signal in the degree of generalism for the orchids (p-value>0.05). 
 
 
 
@@ -177,3 +180,7 @@ The representation of the results using `plot_phylosignal_sub_network` is a phyl
 ## Option 2: Test the robustness of the findings to phylogenetic uncertainty and/or sampling bias
 
 This can be achieved by testing the robustness of the results to phylogenetic uncertainty (using a Bayesian tree posterior, by investigating the influence of polytomy…) or sampling bias (by subsampling over-represented species/clades). See Perez-Lamarque *et al.* (*in prep.*) for more details.
+
+
+
+*PS :*  using the function  `phylosignal_network`, you can also apply the approach PBLM (Ives and Godfray, 2006) by specifying  `method="PBLM"`. However, given the high type-I error of this approach when testing for phylogenetic signal in species interactions, this is discouraged. 
