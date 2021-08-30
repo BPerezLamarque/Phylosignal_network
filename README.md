@@ -9,7 +9,7 @@ This tutorial explains how to measure the phylogenetic signal in species interac
 
 
 **Citation:** Benoît Perez-Lamarque, Odile Maliet, Marc-André Selosse, Florent Martos, and Hélène Morlon, (*in prep.*)
-*Do closely related species interact with similar partners? Testing for phylogenetic signal in ecological networks*.
+*Do closely related species interact with similar partners? Testing for phylogenetic signal in interaction networks*.
 
 
 **Contact:** Benoît Perez-Lamarque, benoit.perez.lamarque@gmail.com
