@@ -195,6 +195,14 @@ which corresponds to a table where each line corresponds to a tested orchid sub-
 
 The representation of the results using `plot_phylosignal_sub_network` is a phylogenetic tree with nodes colored according to the clade-specific phylogenetic signals. Blue nodes are not significant (based in the Bonferonni correction), grey nodes are not tested (less than  `minimum` descending tips), and orange-red nodes represent significant phylogenetic signals and their color indicates the strength of the correlation.
 
+<p align="center">
+    <img src="https://github.com/BPerezLamarque/Phylosignal_network/blob/master/example/example_orchid_sub_clades.png" width="500">
+</p>
+
+<p align="center">
+    <b> Clade-specific phylogenetic signals in species interactions in the orchids. The only significant phylogenetic signal (orange dot) corresponds to the Angraecineae.</b>
+</p>
+
 
 <br> <br>
 
