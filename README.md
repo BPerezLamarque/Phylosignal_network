@@ -167,10 +167,31 @@ plot_phylosignal_sub_network(tree_A = tree_orchids, results_clade_A)
 | `minimum` | indicates the minimal number of descending species for a node in tree A to compute its clade-specific phylogenetic signal.  |
 | `degree` | if  `degree=TRUE `, Mantel tests testing for phylogenetic signal in the number of partners are additionally performed in each sub-clade.|
     
+<br> <br>
+
+The output of  `phylosignal_sub_network` is then:
 
 
+|node | nb_A | nb_B  | mantel_cor | pvalue_high | pvalue_low | pvalue_high_corrected | pvalue_low_corrected| 
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 71   | 70   | 93 | -0.03224387       | 0.670     |  0.331               |   1.000                | 1.000| 
+| 72   | 16   | 27 | -0.07060626       | 0.639     |  0.362                |  1.000                | 1.000| 
+| 73   | 15   | 26 | -0.20381036       | 0.954      | 0.047                |  1.000                | 0.752| 
+| 74   | 13   | 26 | -0.05309340       | 0.488      | 0.513                |  1.000                | 1.000| 
+| 75   | 12   | 24 |  0.04577263       | 0.297      | 0.704                 | 1.000                | 1.000| 
+| 79   | 54   | 79  | 0.01193616       | 0.439      | 0.562                 | 1.000                | 1.000| 
+| 80   | 53   | 78 | -0.12537619       | 0.924      | 0.077                 | 1.000              |   1.000| 
+| 83   | 11   | 23 | -0.07965825       | 0.808      | 0.193                 | 1.000               |  1.000| 
+| 87   | 39   | 56  | 0.03310306       | 0.368      | 0.633                 | 1.000                | 1.000| 
+| 90   | 36   | 53  | 0.12048399       | 0.135      | 0.866                 | 1.000                | 1.000| 
+| 92   | 34   | 53  | 0.36600645       | 0.001      | 1.000                 | **0.016**             |    1.000| 
+| 98   | 28   | 44  | 0.15359285       | 0.005      | 0.996                 | 0.080                | 1.000| 
+| 105   | 20   | 38  | 0.05440825      |  0.241     |  0.760                |  1.000               |  1.000| 
+| 108   | 17   | 34 | -0.12135866      |  0.895     |  0.106                |  1.000               |  1.000| 
+| 112   | 13   | 29 | -0.04986268      |  0.590     |  0.411                |  1.000               |  1.000| 
+| 114   | 11   | 27  | 0.12542181       | 0.169      | 0.832                |  1.000                | 1.000| 
 
-The output of  `phylosignal_sub_network` corresponds to a table where each line corresponds to a tested orchid sub-clade and which contains at least 8 columns: the name of the node (**node**), the number of species in the corresponding orchid sub-clade (**nb_A**), the number of fungal species  associated with the corresponding orchid sub-clade (**nb_B**), the Mantel correlation for the orchid sub-clade (**mantel_cor**), its associated upper p-value (**pvalue_high**), its associated lower p-value (**pvalue_low**), and the corresponding Bonferroni corrected p-values (**pvalue_high_corrected** and **pvalue_low_corrected**).
+which corresponds to a table where each line corresponds to a tested orchid sub-clade and which contains at least 8 columns: the name of the node (**node**), the number of species in the corresponding orchid sub-clade (**nb_A**), the number of fungal species  associated with the corresponding orchid sub-clade (**nb_B**), the Mantel correlation for the orchid sub-clade (**mantel_cor**), its associated upper p-value (**pvalue_high**), its associated lower p-value (**pvalue_low**), and the corresponding Bonferroni corrected p-values (**pvalue_high_corrected** and **pvalue_low_corrected**).
 
 The representation of the results using `plot_phylosignal_sub_network` is a phylogenetic tree with nodes colored according to the clade-specific phylogenetic signals. Blue nodes are not significant (based in the Bonferonni correction), grey nodes are not tested (less than  `minimum` descending tips), and orange-red nodes represent significant phylogenetic signals and their color indicates the strength of the correlation.
 
