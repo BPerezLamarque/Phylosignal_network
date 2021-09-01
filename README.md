@@ -213,5 +213,6 @@ The representation of the results using `plot_phylosignal_sub_network` is a phyl
 This can be achieved by testing the robustness of the results to phylogenetic uncertainty (*e.g.* using a Bayesian tree posterior) or sampling bias (by subsampling over-represented species/clades). See [Perez-Lamarque *et al.* (*in prep.*)](https://www.biorxiv.org/content/10.1101/2021.08.30.458192v1) for more details.
 
 
+<br> <br>
 
-*PS :*  using the function  `phylosignal_network`, you can also apply the approach PBLM (Ives and Godfray, 2006) by specifying  `method="PBLM"`. However, given the high type-I error of this approach when testing for phylogenetic signal in species interactions, this is discouraged.
+*NB:*  using the function  `phylosignal_network`, you can also apply the approach PBLM (Ives and Godfray, 2006) by specifying  `method="PBLM"`. However, given the high type-I error of this approach when testing for phylogenetic signal in species interactions, this is discouraged.
