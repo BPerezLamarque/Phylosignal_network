@@ -9,7 +9,7 @@ This tutorial explains how to measure the phylogenetic signal in species interac
 
 
 **Citation:** Benoît Perez-Lamarque, Odile Maliet, Marc-André Selosse, Florent Martos, and Hélène Morlon,
-*Do closely related species interact with similar partners? Testing for phylogenetic signal in interaction networks*, bioRxiv, doi: https://doi.org/10.1101/2021.08.30.458192.
+*Do closely related species interact with similar partners? Testing for phylogenetic signal in interaction networks*, bioRxiv, [doi: https://doi.org/10.1101/2021.08.30.458192](https://www.biorxiv.org/content/10.1101/2021.08.30.458192v1).
 
 
 **Contact:** Benoît Perez-Lamarque, benoit.perez.lamarque@gmail.com
@@ -210,7 +210,7 @@ The representation of the results using `plot_phylosignal_sub_network` is a phyl
 
 ## Option 2: Test the robustness of the findings to phylogenetic uncertainty and/or sampling bias
 
-This can be achieved by testing the robustness of the results to phylogenetic uncertainty (*e.g.* using a Bayesian tree posterior) or sampling bias (by subsampling over-represented species/clades). See Perez-Lamarque *et al.* (*in prep.*) for more details.
+This can be achieved by testing the robustness of the results to phylogenetic uncertainty (*e.g.* using a Bayesian tree posterior) or sampling bias (by subsampling over-represented species/clades). See [Perez-Lamarque *et al.* (*in prep.*)](https://www.biorxiv.org/content/10.1101/2021.08.30.458192v1) for more details.
 
 
 
