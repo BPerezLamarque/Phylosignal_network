@@ -15,7 +15,7 @@ This tutorial explains how to measure the phylogenetic signal in species interac
 **Contact:** Benoît Perez-Lamarque, benoit.perez.lamarque@gmail.com
 
 
-Simulations used to investigate the performances of the different approaches to measure the phylogenetic signal in species interactions in bipartite interaction networks are available in the folder "simulations" with an associated README. Functions to simulate the BipartiteEvol interaction networks are available in RPANDA, while the script used to simulate interaction networks with a phylogenetic signal in the number of partners (and not their identity) can be found [here](https://github.com/BPerezLamarque/Phylosignal_network/blob/master/example/sim_signal_number_partners.R).
+**Simulations:** Simulations used to investigate the performances of the different approaches to measure the phylogenetic signal in species interactions in bipartite interaction networks are available in the folder "simulations" with an associated README. Functions to simulate the BipartiteEvol interaction networks are available in RPANDA, while the script used to simulate interaction networks with a phylogenetic signal in the number of partners (and not their identity) can be found [here](https://github.com/BPerezLamarque/Phylosignal_network/blob/master/example/sim_signal_number_partners.R).
 
 
 # Contents:
