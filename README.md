@@ -71,7 +71,7 @@ tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
 ##  Step 1: Testing for the phylogenetic signal in the species interactions
 
 
-This first step uses the function  `phylosignal_network` to compute the phylogenetic signal in species interactions (do closely related species interact with similar partners?) using a simple Mantel test or the phylogenetic signal in the degree of generalism (do closely related species interact with the same number of partners?). Mantel tests measuring phylogenetic signal in species interactions can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances.
+This first step uses the function  `phylosignal_network` to compute the phylogenetic signal in species interactions (do closely related species interact with similar partners?) using a simple Mantel test. Mantel tests measuring phylogenetic signal in species interactions can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances.
 
 ```r
 
@@ -103,14 +103,14 @@ Thus, here we do not detect any significant phylogenetic signal in species inter
 
 <br> <br>
 
-##  Step 2: Testing for the phylogenetic signal in the degree of generalism
+##  Step 2: Testing for the phylogenetic signal in the number of partners
 
 
-This second step also uses the function  `phylosignal_network` to compute the phylogenetic signal in the degree of generalism (do closely related species interact with the same number of partners?) using a simple Mantel test. The goal of this step is especially to verify if there is s significant phylogenetic signal in species interactions (step 1), whether this step can be caused by a phylogenetic signal in the degree of generalism, rather than in the identity of the interacting species.
+This second step also uses the function  `phylosignal_network` to compute the phylogenetic signal in the number of partners (the degree; *i.e.* do closely related species interact with the same number of partners?) using a simple Mantel test. The goal of this step is especially to verify if there is a significant phylogenetic signal in species interactions (step 1), whether this phylogenetic signal in species interactions can be caused by a phylogenetic signal in the number of partners, rather than in the identity of the interacting species.
 
 ```r
 
-# compute the phylogenetic signal in the degree of generalism for orchids 
+# compute the phylogenetic signal in the number of partners for orchids 
 phylosignal_network(network, tree_A = tree_orchids, method = "degree", correlation = "Pearson", nperm=10000)
 
 
@@ -120,7 +120,7 @@ phylosignal_network(network, tree_A = tree_orchids, method = "degree", correlati
 | --- | --- |
 | `network` | a matrix representing the ecological interaction network with species from guild A in columns and species from guild B in rows. |
 | `tree_A` | a phylogenetic tree of the guild A (the columns of the interaction network). |
-| `correlation` |indicates which correlation is used in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
+| `correlation` | indicates which correlation is used in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
 | `nperm` | number of permutations to evaluate the significance of the Mantel test.  |
 
 
@@ -133,7 +133,7 @@ The output of  `phylosignal_network` is then:
 
 which corresponds to the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), and the Mantel correlation between phylogenetic distances and degree difference distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_high_A**), its associated lower p-value (**pvalue_low_A**).
 
-Thus, here we do not detect any significant phylogenetic signal in the degree of generalism for the orchids (p-value>0.05). 
+Thus, here we do not detect any significant phylogenetic signal in the number of partners for the orchids (p-value>0.05). 
 
 
 
@@ -145,12 +145,12 @@ Thus, here we do not detect any significant phylogenetic signal in the degree of
 ## Option 1: Investigate clade-specific phylogenetic signals
 
 
-This first option uses the function  `phylosignal_sub_network` to  compute the clade-specific phylogenetic signals in species interactions using simple Mantel tests with Bonferroni correction. For each node of the tree A having a certain number of descending species, it computes the phylogenetic signal in the resulting sub-network by performing a Mantel test between the phylogenetic distances and the ecological distances for the given sub-clade of tree A. Mantel tests can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances. The results of the clade-specific phylogenetic signal analysis can be represented using the function  `plot_phylosignal_sub_network`.
+This first option uses the function  `phylosignal_sub_network` to  compute the clade-specific phylogenetic signals in species interactions using simple Mantel tests with Bonferroni correction. For each node of the tree A having a certain number of descending species (*e.g.* 10), it computes the phylogenetic signal in the resulting sub-network by performing a Mantel test between the phylogenetic distances and the ecological distances for the given sub-clade of tree A. Mantel tests can be computed using quantified or binary networks, with the Jaccard or UniFrac ecological distances. The results of the clade-specific phylogenetic signal analysis can be represented using the function  `plot_phylosignal_sub_network`.
 
 ```r
 # compute clade-specific phylogenetic signals in species interactions for orchids
 
-results_clade_A <- phylosignal_sub_network(network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=100000, minimum=10)
+results_clade_A <- phylosignal_sub_network(network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=100000, minimum=10, degree=F)
 
 plot_phylosignal_sub_network(tree_A = tree_orchids, results_clade_A)
 
@@ -165,6 +165,8 @@ plot_phylosignal_sub_network(tree_A = tree_orchids, results_clade_A)
 | `correlation` |indicates which correlation is used in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
 | `nperm` | number of permutations to evaluate the significance of the Mantel test.  |
 | `minimum` | indicates the minimal number of descending species for a node in tree A to compute its clade-specific phylogenetic signal.  |
+| `degree` | if  `degree=TRUE `, Mantel tests testing for phylogenetic signal in the number of partners are additionally performed in each sub-clade.|
+    
 
 
 
