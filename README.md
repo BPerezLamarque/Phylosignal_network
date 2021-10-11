@@ -99,7 +99,7 @@ The output of  `phylosignal_network` is:
 
  which corresponds to the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), the Mantel correlation  between the phylogenetic distances and ecological distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_upper_A**, *i.e.* the fraction of permutations that led to higher correlation values), its associated lower p-value (**pvalue_lower_A**, *i.e.* the fraction of permutations that led to lower correlation values), and  the Mantel correlation between the phylogenetic distances and ecological distances for fungi (**mantel_cor_B**), its associated upper p-value (**pvalue_upper_B**), abd its associated lower p-value (**pvalue_lower_B**),
 
-Here, **pvalue_upper_A**>0.05 so closely related orchids species do not tend to intercat with similar mycorrhizal fungi. Similarily, **pvalue_upper_B**>0.05 so closely related fungi do not tend to intercat with similar orchids. Thus, we do not detect any significant phylogenetic signal in species interactions between the orchids and their mycorrhizal fungi (all p-values>0.05). 
+Here, **pvalue_upper_A>0.05** so closely related orchids species do not tend to intercat with similar mycorrhizal fungi. Similarily, **pvalue_upper_B>0.05** so closely related fungi do not tend to intercat with similar orchids. Thus, we do not detect any significant phylogenetic signal in species interactions between the orchids and their mycorrhizal fungi (all p-values>0.05). 
 
 <br> <br>
 
@@ -133,7 +133,7 @@ The output of  `phylosignal_network` is then:
 
 which corresponds to the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), and the Mantel correlation between phylogenetic distances and degree difference distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_upper_A**, *i.e.* the fraction of permutations that led to higher correlation values), and its associated lower p-value (**pvalue_lower_A**, *i.e.* the fraction of permutations that led to lower correlation values).
 
-Here, **pvalue_upper_A**>0.05, so we do not detect any significant phylogenetic signal in the number of partners for the orchids. 
+Here, **pvalue_upper_A>0.05**, so we do not detect any significant phylogenetic signal in the number of partners for the orchids. 
 
 
 
@@ -200,7 +200,7 @@ The representation of the results using `plot_phylosignal_sub_network` is a phyl
 </p>
 
 <p align="center">
-    <b> Clade-specific phylogenetic signals in species interactions in the orchids. The only significant phylogenetic signal (orange dot; `pvalue_upper_corrected`<0.05  ) corresponds to the Angraecineae.</b>
+    <b> Clade-specific phylogenetic signals in species interactions in the orchids. The only significant phylogenetic signal (orange dot; pvalue_upper_corrected<0.05  ) corresponds to the Angraecineae.</b>
 </p>
 
 
