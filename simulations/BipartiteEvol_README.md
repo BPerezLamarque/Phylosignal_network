@@ -1,4 +1,6 @@
 
+
+
 This folder contains 2,400 bipartite interaction networks simulated using BipartiteEvol (Maliet et al. 2020) with the R-package RPANDA (Morlon et al. 2016; R Core Team 2020). 
 
 We considered a total number of 500 (simul F), 1,000 (simul E), 2,000 (simul D), 3,000 (simul A), 4,000 (simul B), or 5,000 (simul C) pairs of interacting individuals per simulation. 
@@ -13,3 +15,6 @@ We used a mutation rate μ=0.01 and followed the interacting individuals during 
 
 At the end, we extracted for each guild (A or B) a species tree from its genealogy by randomly selecting one individual per species (two trees per simulations in the Newick format) 
 and reconstructed the corresponding weighted interaction network (a matrix in .csv format) by counting the number of occurrences of each interspecific interaction. 
+
+
+The scripts for generated such networks and for measuring the phylogenetic signals (methods as described in Perez-Lamarque et al. in prep) are available in the folder "script/". The file "script_phylogenetic_signal_network.R" is the main script.
