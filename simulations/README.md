@@ -1,6 +1,6 @@
 # Scripts and simulations 
 
-This folder contains 2,400 bipartite interaction networks simulated using BipartiteEvol (Maliet et al. 2020) with the R-package RPANDA (Morlon et al. 2016; R Core Team 2020). Functions to simulate the BipartiteEvol interaction networks are available in RPANDA, while the script used to simulate interaction networks with a phylogenetic signal in the number of partners (and not their identity) can be found [here](https://github.com/BPerezLamarque/Phylosignal_network/blob/master/example/sim_signal_number_partners.R). Alternatively, one can found all the the scripts for generated such networks and for measuring the phylogenetic signals in the folder `script/` (the file`script_phylogenetic_signal_network.R` is the main script).
+This folder contains 2,400 bipartite interaction networks simulated using BipartiteEvol (Maliet et al. 2020) with the R-package RPANDA (Morlon et al. 2016; R Core Team 2020). Functions to simulate the BipartiteEvol interaction networks are available in [RPANDA](https://github.com/hmorlon/PANDA) (see function `sim.BipartiteEvol`), while the script used to simulate interaction networks with a phylogenetic signal in the number of partners (and not their identity) can be found [here](https://github.com/BPerezLamarque/Phylosignal_network/blob/master/example/sim_signal_number_partners.R). Alternatively, one can found all the the scripts for generated such networks and for measuring the phylogenetic signals in the folder `script/` (the file`script_phylogenetic_signal_network.R` is the main script).
 
 
 
