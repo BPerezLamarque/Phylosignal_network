@@ -1,7 +1,8 @@
+# Scripts and simulations 
+
+This folder contains 2,400 bipartite interaction networks simulated using BipartiteEvol (Maliet et al. 2020) with the R-package RPANDA (Morlon et al. 2016; R Core Team 2020). Functions to simulate the BipartiteEvol interaction networks are available in RPANDA, while the script used to simulate interaction networks with a phylogenetic signal in the number of partners (and not their identity) can be found [here](https://github.com/BPerezLamarque/Phylosignal_network/blob/master/example/sim_signal_number_partners.R). Alternatively, one can found all the the scripts for generated such networks and for measuring the phylogenetic signals in the folder `script/` (the file`script_phylogenetic_signal_network.R` is the main script).
 
 
-
-This folder contains 2,400 bipartite interaction networks simulated using BipartiteEvol (Maliet et al. 2020) with the R-package RPANDA (Morlon et al. 2016; R Core Team 2020). 
 
 We considered a total number of 500 (simul F), 1,000 (simul E), 2,000 (simul D), 3,000 (simul A), 4,000 (simul B), or 5,000 (simul C) pairs of interacting individuals per simulation. 
 
@@ -17,4 +18,10 @@ At the end, we extracted for each guild (A or B) a species tree from its genealo
 and reconstructed the corresponding weighted interaction network (a matrix in .csv format) by counting the number of occurrences of each interspecific interaction. 
 
 
-The scripts for generated such networks and for measuring the phylogenetic signals (methods as described in Perez-Lamarque et al. in prep) are available in the folder "script/". The file "script_phylogenetic_signal_network.R" is the main script.
+
+
+**Citation:** Benoît Perez-Lamarque, Odile Maliet, Benoît Pichon, Marc-André Selosse, Florent Martos, and Hélène Morlon,
+*Do closely related species interact with similar partners? Testing for phylogenetic signal in interaction networks*, bioRxiv, [doi: https://doi.org/10.1101/2021.08.30.458192](https://www.biorxiv.org/content/10.1101/2021.08.30.458192v1).
+
+
+**Contact:** Benoît Perez-Lamarque, benoit.perez.lamarque@gmail.com

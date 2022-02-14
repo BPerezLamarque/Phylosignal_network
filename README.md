@@ -8,14 +8,14 @@
 This tutorial explains how to measure the phylogenetic signal in species interactions in a bipartite ecological network using the R-package RPANDA (Morlon *et al.*, 2016), *i.e.* how to test whether closely related species interact with similar partners.
 
 
-**Citation:** Benoît Perez-Lamarque, Odile Maliet, Marc-André Selosse, Florent Martos, and Hélène Morlon,
+**Citation:** Benoît Perez-Lamarque, Odile Maliet, Benoît Pichon, Marc-André Selosse, Florent Martos, and Hélène Morlon,
 *Do closely related species interact with similar partners? Testing for phylogenetic signal in interaction networks*, bioRxiv, [doi: https://doi.org/10.1101/2021.08.30.458192](https://www.biorxiv.org/content/10.1101/2021.08.30.458192v1).
 
 
 **Contact:** Benoît Perez-Lamarque, benoit.perez.lamarque@gmail.com
 
 
-**Simulations:** Simulations used to investigate the performances of the different approaches to measure the phylogenetic signal in species interactions in bipartite interaction networks are available in the folder [simulations](https://github.com/BPerezLamarque/Phylosignal_network/tree/master/simulations) with an associated [README](https://github.com/BPerezLamarque/Phylosignal_network/blob/master/simulations/BipartiteEvol_README.txt). Functions to simulate the BipartiteEvol interaction networks are available in RPANDA, while the script used to simulate interaction networks with a phylogenetic signal in the number of partners (and not their identity) can be found [here](https://github.com/BPerezLamarque/Phylosignal_network/blob/master/example/sim_signal_number_partners.R).
+**Simulations:** Simulations used to investigate the performances of the different approaches to measure the phylogenetic signal in species interactions in bipartite interaction networks are available in the folder [simulations](https://github.com/BPerezLamarque/Phylosignal_network/tree/master/simulations). Functions to simulate the BipartiteEvol interaction networks are available in RPANDA, while the script used to simulate interaction networks with a phylogenetic signal in the number of partners (and not their identity) can be found [here](https://github.com/BPerezLamarque/Phylosignal_network/blob/master/example/sim_signal_number_partners.R).
 
 
 # Contents:
