@@ -26,5 +26,7 @@ and reconstructed the corresponding weighted interaction network (a matrix in .c
 **Contact:** Benoît Perez-Lamarque, benoit.perez.lamarque@gmail.com
 
 
-All the scripts for generating such networks and for measuring the phylogenetic signals in species interactions (using the methods described in Perez-Lamarque et al. 2021) are available in the folder `script/` (the file`script_phylogenetic_signal_network.R` is the main script).
+All the **scripts for generating such networks and for measuring the phylogenetic signals in species interactions** (using the methods described in Perez-Lamarque et al. 2021) are available in the folder `script/` (the file`script_phylogenetic_signal_network.R` is the main script).
+
+Finally, the example dataset of a mycorrhizal network between orchids and mycorrhizal fungi from La Réunion island (Martos et al., 2012) along with the reconstructed phylogenetic trees of the orchids and the fungi are available in the [R-package RPANDA](https://github.com/BPerezLamarque/Phylosignal_network) by loading `data(mycorrhizal_network)`.
 
