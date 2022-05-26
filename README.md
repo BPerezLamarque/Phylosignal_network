@@ -65,7 +65,6 @@ tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
 
 ```
 
-<br> <br>
 
 
 <p align="center">
@@ -73,7 +72,7 @@ tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
 </p>
 
 <p align="center">
-    <b>Main steps for measuring phylogenetic signals in species interactions.</b>
+    <b>Recommendations for measuring phylogenetic signals in species interactions.</b>
 </p>
 
 
