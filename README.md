@@ -21,7 +21,7 @@ This tutorial explains how to measure the phylogenetic signal in species interac
 # Contents:
 **[Installation](#installation)**\
 **[Measuring the phylogenetic signal](#measuring-phylogenetic-signal)**\
-**[Optional steps](#optional-steps)**
+**[Optional steps](#optional-steps)**\
 **[Other possibilities](#other-possibilities)**
 
 

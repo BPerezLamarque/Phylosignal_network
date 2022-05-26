@@ -28,8 +28,8 @@ and reconstructed the corresponding weighted interaction network (a matrix in .c
 
 All the **scripts for generating such networks and for measuring the phylogenetic signals in species interactions** (using the methods described in Perez-Lamarque et al. 2021) are available in the folder `script/`:
 - the file `script_phylogenetic_signal_network.R` is the main script for replicating the analyses.
-- the files `function_phylo_signal_network.R` and `permute.c` contain the functions used for testing for phylogenetic signals. These functions are all included in the RAPNDA R-package. 
-- the files  `ComputeMetricsEtablissement.R` , `beta.R`, and `fitness.c` are used for performing the BipartiteEvol simulations.  These functions are also all included in the RAPNDA R-package. 
+- the files `function_phylo_signal_network.R` and `permute.c` contain the functions used for testing for phylogenetic signals. These functions are all included in the RPANDA R-package. 
+- the files  `ComputeMetricsEtablissement.R` , `beta.R`, and `fitness.c` are used for performing the BipartiteEvol simulations.  These functions are also all included in the RPANDA R-package. 
 
 Finally, the example dataset of a mycorrhizal network between orchids and mycorrhizal fungi from La Réunion island (Martos et al., 2012) along with the reconstructed phylogenetic trees of the orchids and the fungi are available in the [R-package RPANDA](https://github.com/BPerezLamarque/Phylosignal_network) by loading `data(mycorrhizal_network)`.
 
