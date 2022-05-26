@@ -131,11 +131,11 @@ phylosignal_network(network, tree_A = tree_orchids, tree_B = tree_fungi, method 
 | `method` | indicates which method to use to compute the phylogenetic signal in species interactions: you can choose "Jaccard_weighted" for computing ecological distances using Jaccard dissimilarities (or "Jaccard_binary" to not take into account the abundances of the interactions), or "GUniFrac" to compute the weighted (or generalized) UniFrac distances (or "UniFrac_unweighted" to not take into account the interaction abundances). |
 | `correlation` |indicates which correlation to use in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
 | `nperm` | indicates the number of permutations to evaluate the significance of the Mantel test.  |
-| `permutations` | indicates which permutations to compute either "shuffle" (*i.e.* random shufflying of the distance matrix, as in a regular Mantel test) or "nbpartners" (*i.e.* keeping constant the number of partners per species and shuffle at random their identity).  |
+| `permutations` | indicates which permutations to compute either "shuffle" (*i.e.* random shufflying of the distance matrix, as in a regular Mantel test) or "nbpartners" (*i.e.* keeping constant the number of partners per species and shuffling at random their identity).  |
 
 <br> <br>
 
-The output of  `phylosignal_network` in Step 2 is has the same correlation values as in Step 1. Only the **pvalues** are affected by the changes in the permuation strategey. 
+The output of  `phylosignal_network` in Step 2 has the same correlation values as in Step 1. Only the **pvalues** are affected by the changes in the permuation strategy. 
 For instance, if in Step 1 **pvalue_upper_A<0.05** and in  Step 2**pvalue_upper_A<0.05**, then we can conclude that there is a significant phylogenetic signal in species interactions that can not be fully explained by the phylogenetic signal in the number of partners. 
 Alternatively,  if in Step 1 **pvalue_upper_A<0.05** and in  Step 2**pvalue_upper_A>0.05**, then we cannot exlude that the  phylogenetic signal in species interactions observed in Step 1 is not explained by the phylogenetic signal in the number of partners.
 
