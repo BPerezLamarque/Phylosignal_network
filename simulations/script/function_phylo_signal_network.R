@@ -487,11 +487,44 @@ full <- function (v) {
 
 
 
-mantel_test_marginal <- function(network, tree_A, tree_B, method="Jaccard_binary", nperm=1000, correlation="Pearson"){
+mantel_test_nbpartners <- function(network, tree_A, tree_B = NULL, method="Jaccard_binary", nperm=1000, correlation="Pearson"){
   
   if (!correlation %in% c("Pearson", "Spearman")) {stop("\"correlation\" must be among 'Pearson' or 'Spearman'.")}
   if (!is.numeric(nperm)) {stop("Please provide a numeric number of permutations (\"nperm\").")}
   
+  if (!inherits(tree_A, "phylo")) {stop("object \"tree_A\" is not of class \"phylo\".")}
+  if (!is.null(tree_B)) {if (!inherits(tree_B, "phylo")) {stop("object \"tree_B\" is not of class \"phylo\".")}}
+  
+  if (is.null(method)) {stop("Please provide a \"method\" to compute phylogenetic signals among 'Jaccard_weighted', 'Jaccard_binary', 'Bray-Curtis', 'GUniFrac', and 'UniFrac_unweighted'.")}
+  if (method %in% c("GUniFrac", "UniFrac_unweighted", "PBLM", "PBLM_binary")) {if (is.null(tree_B)) stop("Please provide a phylogenetic tree \"tree_B\" for guild B.")}
+  if (!method %in% c("Jaccard_weighted","Jaccard_binary", "Bray-Curtis", "GUniFrac", "UniFrac_unweighted")) {stop("Please provide a \"method\" to compute phylogenetic signals among 'Jaccard_weighted', 'Jaccard_binary', 'Bray-Curtis', 'GUniFrac', and 'UniFrac_unweighted'.")}
+  
+  if (nrow(network)<2){stop("Please provide a \"network\" with at least 2 species in clade B.")}
+  if (ncol(network)<2){stop("Please provide a \"network\" with at least 2 species in clade A.")}
+  
+  
+  # Only keep species with at least 1 interaction
+  network <- network[rowSums(network)>0,]
+  network <- network[,colSums(network)>0]
+  
+  # A in columns and B in rows
+  nb_A <- ncol(network)
+  nb_B <- nrow(network)
+  names(nb_A) <- "nb_A"
+  names(nb_B) <- "nb_B"
+  
+  # Check names
+  if (all(is.null(colnames(network)))|all(is.null(rownames(network)))) {stop("Please provide a \"network\" with row names and columns names matching the species names.")}
+  
+  if (!all(colnames(network) %in% tree_A$tip.label)){stop("Please provide a \"tree_A\" for all the species in clade A (the columns of the intercation network).")}
+
+  tree_A <- ape::drop.tip(tree_A,tip=tree_A$tip.label[which(!tree_A$tip.label %in% colnames(network))])
+
+  
+  if (!is.rooted(tree_A)){tree_A <- phytools::midpoint.root(tree_A) }
+
+  network <- network[1:nrow(network),tree_A$tip.label]
+
   compute_eco_dist <- function(network){
     # binary Jaccard distances
     if (method=="Jaccard_binary"){
@@ -533,7 +566,7 @@ mantel_test_marginal <- function(network, tree_A, tree_B, method="Jaccard_binary
   # Perform Mantel test:
   
   # cophenetic distances
-  cophe_A <- cophenetic.phylo(tree_A)
+  cophe_A <- ape::cophenetic.phylo(tree_A)
 
   nb_A <- ncol(network)
   nb_B <- nrow(network)
@@ -618,12 +651,12 @@ phylosignal_network <- function(network, tree_A, tree_B=NULL, method = "Jaccard_
   if (!all(colnames(network) %in% tree_A$tip.label)){stop("Please provide a \"tree_A\" for all the species in clade A (the columns of the intercation network).")}
   if (only_A==FALSE) { if (!all(rownames(network) %in% tree_B$tip.label)){stop("Please provide a \"tree_B\" for all the species in clade B (the rows of the intercation network).")}}
   
-  tree_A <- drop.tip(tree_A,tip=tree_A$tip.label[which(!tree_A$tip.label %in% colnames(network))])
-  if (only_A==FALSE) { tree_B <- drop.tip(tree_B,tip=tree_B$tip.label[which(!tree_B$tip.label %in% rownames(network))])}
+  tree_A <- ape::drop.tip(tree_A,tip=tree_A$tip.label[which(!tree_A$tip.label %in% colnames(network))])
+  if (only_A==FALSE) { tree_B <- ape::drop.tip(tree_B,tip=tree_B$tip.label[which(!tree_B$tip.label %in% rownames(network))])}
   
   
-  if (!is.rooted(tree_A)){tree_A <- midpoint.root(tree_A) }
-  if (only_A==FALSE) { if (!is.rooted(tree_B)){tree_A <- midpoint.root(tree_B) }}
+  if (!is.rooted(tree_A)){tree_A <- phytools::midpoint.root(tree_A) }
+  if (only_A==FALSE) { if (!is.rooted(tree_B)){tree_A <- phytools::midpoint.root(tree_B) }}
   
   if (only_A==TRUE) { 
     network <- network[1:nrow(network),tree_A$tip.label]
@@ -692,8 +725,8 @@ phylosignal_network <- function(network, tree_A, tree_B=NULL, method = "Jaccard_
       # Perform Mantel test:
       
       # cophenetic distances
-      cophe_A <- cophenetic.phylo(tree_A)
-      if (only_A==FALSE) cophe_B <- cophenetic.phylo(tree_B)
+      cophe_A <- ape::cophenetic.phylo(tree_A)
+      if (only_A==FALSE) cophe_B <- ape::cophenetic.phylo(tree_B)
       
       results <- c(as.integer(nb_A), as.integer(nb_B), NA, NA, NA, NA, NA, NA)
       names(results) <-  c("nb_A","nb_B","mantel_cor_A","pvalue_upper_A","pvalue_lower_A", "mantel_cor_B", "pvalue_upper_B", "pvalue_lower_B")
@@ -735,10 +768,8 @@ phylosignal_network <- function(network, tree_A, tree_B=NULL, method = "Jaccard_
     
     
     if (permutation=="nbpartners"){
-      mantel_A <- #RPANDA::
-        mantel_test_marginal(network, tree_A, tree_B, method, nperm, correlation)
-      if (only_A==FALSE) {mantel_B <- #RPANDA::
-        mantel_test_marginal(t(network), tree_B, tree_A, method, nperm, correlation)
+      mantel_A <- RPANDA::mantel_test_nbpartners(network, tree_A, tree_B, method, nperm, correlation)
+      if (only_A==FALSE) {mantel_B <- RPANDA::mantel_test_nbpartners(t(network), tree_B, tree_A, method, nperm, correlation)
       }else{mantel_B <- c(NA, NA, NA)}
     }
     
@@ -808,9 +839,9 @@ phylosignal_sub_network <- function(network, tree_A, tree_B=NULL, method = "Jacc
   # only keep species having at least one interaction
   network <- network[rowSums(network)>0,]
   network <- network[,colSums(network)>0]
-  host_tree <- drop.tip(host_tree, tip=host_tree$tip.label[!host_tree$tip.label %in% colnames(network)])
+  host_tree <- ape::drop.tip(host_tree, tip=host_tree$tip.label[!host_tree$tip.label %in% colnames(network)])
   if (!is.null(symbiont_tree)){
-    symbiont_tree <- drop.tip(symbiont_tree, tip=symbiont_tree$tip.label[!symbiont_tree$tip.label %in% rownames(network)])
+    symbiont_tree <- ape::drop.tip(symbiont_tree, tip=symbiont_tree$tip.label[!symbiont_tree$tip.label %in% rownames(network)])
     network <- network[symbiont_tree$tip.label,host_tree$tip.label]
   }else{
     network <- network[,host_tree$tip.label]
@@ -819,9 +850,9 @@ phylosignal_sub_network <- function(network, tree_A, tree_B=NULL, method = "Jacc
   # check a second time (in case of a missing species) 
   network <- network[rowSums(network)>0,]
   network <- network[,colSums(network)>0]
-  host_tree <- drop.tip(host_tree, tip=host_tree$tip.label[!host_tree$tip.label %in% colnames(network)])
+  host_tree <- ape::drop.tip(host_tree, tip=host_tree$tip.label[!host_tree$tip.label %in% colnames(network)])
   if (!is.null(symbiont_tree)){
-    symbiont_tree <- drop.tip(symbiont_tree, tip=symbiont_tree$tip.label[!symbiont_tree$tip.label %in% rownames(network)])
+    symbiont_tree <- ape::drop.tip(symbiont_tree, tip=symbiont_tree$tip.label[!symbiont_tree$tip.label %in% rownames(network)])
     network <- network[symbiont_tree$tip.label,host_tree$tip.label]
   }else{
     network <- network[,host_tree$tip.label]
@@ -833,22 +864,22 @@ phylosignal_sub_network <- function(network, tree_A, tree_B=NULL, method = "Jacc
   nb_sub_clades <- 0
   results_sub_clades <- c()
   for (i in sort(unique(host_tree$edge[,1]))){  # include root  and can be non binary
-    sub_host_tree <- extract.clade(host_tree, i)
+    sub_host_tree <- ape::extract.clade(host_tree, i)
     if (Ntip(sub_host_tree)>=minimum){
       sub_network <- network[,sub_host_tree$tip.label]
       sub_network <- sub_network[which(rowSums(sub_network)>0),,drop=F]
       if (!is.null(symbiont_tree)){
-        sub_symbiont_tree <- drop.tip(symbiont_tree, tip= symbiont_tree$tip.label[!symbiont_tree$tip.label %in% rownames(sub_network)])
+        sub_symbiont_tree <- ape::drop.tip(symbiont_tree, tip= symbiont_tree$tip.label[!symbiont_tree$tip.label %in% rownames(sub_network)])
       }else{sub_symbiont_tree <- NULL}
       
       if (nrow(sub_network)>1){
         nb_sub_clades <- nb_sub_clades+1
-        mantel_test <- phylosignal_network(sub_network, sub_host_tree, sub_symbiont_tree, method = method, nperm = nperm, correlation = correlation, permutation = permutation)
+        mantel_test <- RPANDA::phylosignal_network(sub_network, sub_host_tree, sub_symbiont_tree, method = method, nperm = nperm, correlation = correlation, permutation = permutation)
         
         if (degree==TRUE){
           mantel_degree <- rep("NA", 5)
           tryCatch({
-            mantel_degree <- phylosignal_network(sub_network, sub_host_tree, sub_symbiont_tree, method = "degree", nperm = nperm, correlation = correlation)
+            mantel_degree <- RPANDA::phylosignal_network(sub_network, sub_host_tree, sub_symbiont_tree, method = "degree", nperm = nperm, correlation = correlation)
           }, error=function(e){cat("clade ",i,": ", conditionMessage(e), "\n")})
           results_sub_clades <- rbind(results_sub_clades, c(i, mantel_test[1:5],NA,NA, mantel_degree[3:5] ))
         }else{
@@ -901,7 +932,7 @@ plot_phylosignal_sub_network <- function(tree_A, results_sub_clades, network=NUL
   if (!is.null(network)){
     network <- network[rowSums(network)>0,]
     network <- network[,colSums(network)>0]
-    host_tree <- drop.tip(host_tree, tip=host_tree$tip.label[!host_tree$tip.label %in% colnames(network)])
+    host_tree <- ape::drop.tip(host_tree, tip=host_tree$tip.label[!host_tree$tip.label %in% colnames(network)])
     network <- network[,host_tree$tip.label]
   }
   
