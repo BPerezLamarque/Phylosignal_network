@@ -68,6 +68,15 @@ tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
 <br> <br>
 
 
+<p align="center">
+    <img src="https://github.com/BPerezLamarque/Phylosignal_network/blob/master/example/figures_steps.png" width="500">
+</p>
+
+<p align="center">
+    <b>Main steps for measuring phylogenetic signals in species interactions.</b>
+</p>
+
+
 ##  Step 1: Testing for the phylogenetic signal in the species interactions
 
 
@@ -103,16 +112,15 @@ Here, **pvalue_upper_A>0.05** so closely related orchids species do not tend to 
 
 <br> <br>
 
-##  Step 2: Testing for the phylogenetic signal in the number of partners
+##  Step 2: Testing that the phylogenetic signal is still significant when accounting for the signal in the number of partners:
 
 
-This second step also uses the function  `phylosignal_network` to compute the phylogenetic signal in the number of partners (the degree; *i.e.* do closely related species interact with the same number of partners?) using a simple Mantel test. The goal of this step is to verify if there is a significant phylogenetic signal in species interactions (step 1), whether this phylogenetic signal in species interactions can be caused by a phylogenetic signal in the number of partners (confounding effect), rather than the identity of the interacting partners.
+If there is  significant phylogenetic signal in Step 1, this second first step uses the function  `phylosignal_network` to compute the phylogenetic signal in species interactions using a simple Mantel test with permutations that keep constant the number fo partners per species. Step 2 thus tests whether the phylogenetic signal (observed in Step 1) is still significant when accounting for the confouding effect of the phylogenetic signal in the number of partners.
 
 ```r
 
-# compute the phylogenetic signal in the number of partners for orchids 
-phylosignal_network(network, tree_A = tree_orchids, method = "degree", correlation = "Pearson", nperm=10000)
-
+# compute phylogenetic signals in species interactions with permutations keeping constant the number fo partners 
+phylosignal_network(network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=1000, permutations="nbpartners")
 
 ```
 
@@ -120,20 +128,19 @@ phylosignal_network(network, tree_A = tree_orchids, method = "degree", correlati
 | --- | --- |
 | `network` | a matrix representing the bipartite interaction network with species from guild A in columns and species from guild B in rows. |
 | `tree_A` | a phylogenetic tree of the guild A (the columns of the interaction network). |
-| `correlation` | indicates which correlation to use in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
+| `tree_B` | a phylogenetic tree of the guild B (the rows of the interaction network). |
+| `method` | indicates which method to use to compute the phylogenetic signal in species interactions: you can choose "Jaccard_weighted" for computing ecological distances using Jaccard dissimilarities (or "Jaccard_binary" to not take into account the abundances of the interactions), or "GUniFrac" to compute the weighted (or generalized) UniFrac distances (or "UniFrac_unweighted" to not take into account the interaction abundances). |
+| `correlation` |indicates which correlation to use in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
 | `nperm` | indicates the number of permutations to evaluate the significance of the Mantel test.  |
+| `permutations` | indicates which permutations to compute either "shuffle" (*i.e.* random shufflying of the distance matrix, as in a regular Mantel test) or "nbpartners" (*i.e.* keeping constant the number of partners per species and shuffle at random their identity).  |
 
 <br> <br>
 
-The output of  `phylosignal_network` is then:
+The output of  `phylosignal_network` in Step 2 is has the same correlation values as in Step 1. Only the **pvalues** are affected by the changes in the permuation strategey. 
+For instance, if in Step 1 **pvalue_upper_A<0.05** and in  Step 2**pvalue_upper_A<0.05**, then we can conclude that there is a significant phylogenetic signal in species interactions that can not be fully explained by the phylogenetic signal in the number of partners. 
+Alternatively,  if in Step 1 **pvalue_upper_A<0.05** and in  Step 2**pvalue_upper_A>0.05**, then we cannot exlude that the  phylogenetic signal in species interactions observed in Step 1 is not explained by the phylogenetic signal in the number of partners.
 
-| nb_A | nb_B | mantel_cor_A | pvalue_upper_A | pvalue_lower_A | 
-| --- | --- | --- | --- | --- |
-| 70 | 93 | 0.02 | 0.34 | 0.66  |
-
-which corresponds to the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), and the Mantel correlation between phylogenetic distances and degree difference distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_upper_A**, *i.e.* the fraction of permutations that led to higher correlation values), and its associated lower p-value (**pvalue_lower_A**, *i.e.* the fraction of permutations that led to lower correlation values).
-
-Here, **pvalue_upper_A>0.05**, so we do not detect any significant phylogenetic signal in the number of partners for the orchids. 
+<br> <br>
 
 
 
@@ -193,7 +200,7 @@ The output of  `phylosignal_sub_network` is then:
 
 which corresponds to a table where each line corresponds to a tested orchid sub-clade and which contains at least 8 columns: the name of the node (**node**), the number of species in the corresponding orchid sub-clade (**nb_A**), the number of fungal species  associated with the corresponding orchid sub-clade (**nb_B**), the Mantel correlation for the orchid sub-clade (**mantel_cor**), its associated upper p-value (**pvalue_upper**), its associated lower p-value (**pvalue_lower**), and the corresponding Bonferroni corrected p-values (**pvalue_upper_corrected** and **pvalue_lower_corrected**).
 
-The representation of the results using `plot_phylosignal_sub_network` is a phylogenetic tree with nodes colored according to the clade-specific phylogenetic signals. Blue nodes are not significant (based in the Bonferonni correction), grey nodes are not tested (less than  `minimum` descending tips), and orange-red nodes represent significant phylogenetic signals and their color indicates the strength of the correlation.
+The representation of the results using `plot_phylosignal_sub_network` is a phylogenetic tree with nodes colored according to the clade-specific phylogenetic signals. Blue nodes are not significant (based in the Bonferonni correction), grey nodes are not tested (less than `minimum` descending tips), and orange-red nodes represent significant phylogenetic signals and their color indicates the strength of the correlation.
 
 <p align="center">
     <img src="https://github.com/BPerezLamarque/Phylosignal_network/blob/master/example/example_orchid_sub_clades.png" width="400">
@@ -215,4 +222,53 @@ This can be achieved by testing the robustness of the results to phylogenetic un
 
 <br> <br>
 
-*NB:*  using the function  `phylosignal_network`, you can also apply the approach PBLM (Ives and Godfray, 2006) by specifying  `method="PBLM"`. However, given the high type-I error of this approach when testing for phylogenetic signal in species interactions, this is discouraged.
+
+
+
+
+# Other possibilities:
+
+
+
+
+
+##  Testing for the phylogenetic signal in the number of partners
+
+
+This  step uses the function  `phylosignal_network` to compute the phylogenetic signal in the number of partners (the degree; *i.e.* do closely related species interact with the same number of partners?) using a simple Mantel test. The goal of this step is to verify if there is a significant phylogenetic signal in species interactions (step 1), whether this phylogenetic signal in species interactions can be caused by a phylogenetic signal in the number of partners (confounding effect), rather than the identity of the interacting partners. We refer to this as a sequential Mantel test. 
+
+```r
+
+# compute the phylogenetic signal in the number of partners for orchids 
+phylosignal_network(network, tree_A = tree_orchids, method = "degree", correlation = "Pearson", nperm=10000)
+
+
+```
+
+| Option | Description |
+| --- | --- |
+| `network` | a matrix representing the bipartite interaction network with species from guild A in columns and species from guild B in rows. |
+| `tree_A` | a phylogenetic tree of the guild A (the columns of the interaction network). |
+| `correlation` | indicates which correlation to use in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
+| `nperm` | indicates the number of permutations to evaluate the significance of the Mantel test.  |
+
+<br> <br>
+
+The output of  `phylosignal_network` is then:
+
+| nb_A | nb_B | mantel_cor_A | pvalue_upper_A | pvalue_lower_A | 
+| --- | --- | --- | --- | --- |
+| 70 | 93 | 0.02 | 0.34 | 0.66  |
+
+which corresponds to the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), and the Mantel correlation between phylogenetic distances and degree difference distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_upper_A**, *i.e.* the fraction of permutations that led to higher correlation values), and its associated lower p-value (**pvalue_lower_A**, *i.e.* the fraction of permutations that led to lower correlation values).
+
+Here, **pvalue_upper_A>0.05**, so we do not detect any significant phylogenetic signal in the number of partners for the orchids. 
+
+
+
+##  Using the PBLM approach
+
+The function  `phylosignal_network`, you can also apply the approach PBLM (Ives and Godfray, 2006) by specifying  `method="PBLM"`. However, given the very frequent false positives of this approach when testing for phylogenetic signal in species interactions, this is discouraged.
+
+
+

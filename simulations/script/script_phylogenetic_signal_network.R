@@ -7886,3 +7886,1615 @@ dev.off()
 phylosignal_network(network, tree_Orchids_calibrated, tree_Fungi, method = "PBLM")
 # significant for fungi 
 
+
+
+
+
+
+#### Step 12-A: Perform Mantel test while maintaining the number of partners  ####
+
+
+rm(list=ls())
+
+library(vegan)
+library(phytools)
+library(ggplot2)
+library(GUniFrac,lib.loc="/users/biodiv/bperez/packages/")
+library(parallel)
+require(R.utils)
+
+setwd("/users/biodiv/bperez/data/network_project/bipartite/simulations/simul_1")
+
+
+source("../script/function_phylo_signal_network.R")
+dyn.load("../script/permute.so")
+
+
+list_networks <- as.vector(outer(c("simul_1_A","simul_1_B","simul_1_C","simul_1_D","simul_1_E", "simul_1_F"), c(paste0("neutral_seed_",1:100), paste0("mutualism_", as.vector(outer(1:6, 1:20, paste, sep="_seed_"))), paste0("antagonism_",as.vector(outer(1:9, 1:20, paste, sep="_seed_")))), paste, sep="_"))
+
+
+nb_cores=10
+
+compute_phylo_signal <- function(name, method, correlation, nperm){
+  
+  print(name)
+  network <- read.table(paste0("network_",name,".csv"), header=T,sep=";")
+  
+  colnames(network) <- seq(1:ncol(network))
+  rownames(network) <- seq(1:nrow(network))
+  
+  tree_A <- read.tree(paste0("network_tree_guild_A_",name,".tre"))
+  tree_B <- read.tree(paste0("network_tree_guild_B_",name,".tre"))
+  
+  network <- network[tree_B$tip.label,tree_A$tip.label]
+  
+  res <- phylosignal_network(network, tree_A, tree_B, method = method, 
+                             nperm = nperm, correlation = correlation, only_A = FALSE, permutation ="nbpartners")
+  
+  return(res)
+}
+
+
+method="Jaccard_weighted"
+
+for (correlation in c("Pearson", "Spearman")){
+  
+  nperm=1000
+  
+  results_signal <- matrix(unlist(mclapply(list_networks,compute_phylo_signal,mc.cores=nb_cores, mc.preschedule=F, method=method, correlation=correlation, nperm=nperm)),nrow=length(list_networks),byrow=T)
+  results_signal <- cbind(list_networks, results_signal)
+  results_signal <- data.frame(results_signal, stringsAsFactors =F)
+  if (method %in% c("PBLM", "PBLM_binary")){colnames(results_signal) <- c("name","nb_A", "nb_B", "dA", "dB", "MSETotal", "MSEFull", "MSEStar", "MSEBase")
+  }else{colnames(results_signal) <- c("name","nb_A", "nb_B", "mantel_cor_A","pvalue_high_A","pvalue_low_A", "mantel_cor_B", "pvalue_high_B", "pvalue_low_B")}
+  
+  results_signal$size <- "A"
+  results_signal$size[grep(pattern = "_B_", results_signal$name)] <- "B"
+  results_signal$size[grep(pattern = "_C_", results_signal$name)] <- "C"
+  results_signal$size[grep(pattern = "_D_", results_signal$name)] <- "D"
+  results_signal$size[grep(pattern = "_E_", results_signal$name)] <- "E"
+  results_signal$size[grep(pattern = "_F_", results_signal$name)] <- "F"
+  results_signal$param <- "neutral"
+  results_signal$param[grep(pattern = "_antagonism_1_", results_signal$name)] <- "antagonism_1"
+  results_signal$param[grep(pattern = "_antagonism_2_", results_signal$name)] <- "antagonism_2"
+  results_signal$param[grep(pattern = "_antagonism_3_", results_signal$name)] <- "antagonism_3"
+  results_signal$param[grep(pattern = "_antagonism_4_", results_signal$name)] <- "antagonism_4"
+  results_signal$param[grep(pattern = "_antagonism_5_", results_signal$name)] <- "antagonism_5"
+  results_signal$param[grep(pattern = "_antagonism_6_", results_signal$name)] <- "antagonism_6"
+  results_signal$param[grep(pattern = "_antagonism_7_", results_signal$name)] <- "antagonism_7"
+  results_signal$param[grep(pattern = "_antagonism_8_", results_signal$name)] <- "antagonism_8"
+  results_signal$param[grep(pattern = "_antagonism_9_", results_signal$name)] <- "antagonism_9"
+  results_signal$param[grep(pattern = "_mutualism_1_", results_signal$name)] <- "mutualism_1"
+  results_signal$param[grep(pattern = "_mutualism_2_", results_signal$name)] <- "mutualism_2"
+  results_signal$param[grep(pattern = "_mutualism_3_", results_signal$name)] <- "mutualism_3"
+  results_signal$param[grep(pattern = "_mutualism_4_", results_signal$name)] <- "mutualism_4"
+  results_signal$param[grep(pattern = "_mutualism_5_", results_signal$name)] <- "mutualism_5"
+  results_signal$param[grep(pattern = "_mutualism_6_", results_signal$name)] <- "mutualism_6"
+  
+  write.table(results_signal,paste0("results_phylogenetic_signal_simul_1_",method,"_", correlation,"_nb_partners_constant_1000.csv"), quote=F, sep=";",row.names=F)
+  
+}
+
+
+
+#### Plot results ####
+
+
+rm(list=ls())
+
+library(ggplot2)
+library(vegan)
+library(phytools)
+library(ggplot2)
+library(GUniFrac,lib.loc="/users/biodiv/bperez/packages/")
+library(parallel)
+require(R.utils)
+
+setwd("/users/biodiv/bperez/data/network_project/bipartite/simulations/simul_1")
+
+dyn.load("../script/permute.so")
+source("../script/function_phylo_signal_network.R")
+
+transparent_theme_no <- theme(panel.grid = element_blank(),
+                              axis.line = element_line("black"),
+                              panel.background = element_rect(fill = "transparent",colour = NA),
+                              plot.background = element_rect(fill = "transparent",colour = NA),
+                              legend.key=element_blank(),legend.background=element_blank(),
+                              axis.text.x = element_text(angle = 60, hjust = 1,size=8) ,
+                              axis.title=element_text(face="bold",family="Helvetica",size=10),axis.text=element_text(face="bold"), legend.text = element_text(face="bold"), legend.title = element_text(face="bold"))
+
+
+
+
+for (correlation in c("Pearson", "Spearman")){
+  
+  for (method in c("Jaccard_binary", "Jaccard_weighted","GUniFrac","UniFrac_unweighted")){
+    
+    results_all <- read.table(paste0("results_phylogenetic_signal_simul_1_",method,"_", correlation,"_nb_partners_constant_1000.csv"), header=T,sep=";")
+    
+    
+    results_all$param <- as.character(results_all$param)
+    results_all$size <- as.character(results_all$size)
+    results_all$mantel_cor_A <- as.numeric(as.character(results_all$mantel_cor_A))
+    results_all$pvalue_high_A <- as.numeric(as.character(results_all$pvalue_high_A))
+    results_all$mantel_cor_B <- as.numeric(as.character(results_all$mantel_cor_B))
+    results_all$pvalue_high_B <- as.numeric(as.character(results_all$pvalue_high_B))
+    results_all$nb_A <- as.numeric(as.character(results_all$nb_A))
+    results_all$nb_B <- as.numeric(as.character(results_all$nb_B))
+    
+    print(method)
+    print("A")
+    #print(table(results_all$pvalue_high_A<0.05))  
+    print(length(intersect(which(results_all$pvalue_high_A<0.05), which(results_all$mantel_cor_A>0.10))))  
+    
+    print("B")
+    #print(table(results_all$pvalue_high_B<0.05))  
+    print(length(intersect(which(results_all$pvalue_high_B<0.05), which(results_all$mantel_cor_B>0.10))))  
+    
+    # Plot 
+    results_signal <- results_all
+    
+    
+    # for tree A
+    
+    results_signal$size <- as.factor(results_signal$size)
+    results_signal$size <-  factor(results_signal$size,levels(results_signal$size)[c(5,1,2,3,4,6)])
+    
+    ggplot(results_signal,aes(x=param,y=mantel_cor_A,fill=size))+xlab("Parameters")+ylab("Mantel correlation (A)") +labs(title=" ")+scale_fill_manual(values=c("#27ae60","#7dcea0","#f4d03f","#f5b041","#e67e22","#ba4a00"))+transparent_theme_no + 
+      geom_hline(yintercept=0, linetype="dashed", color="#273746")+
+      scale_x_discrete(labels = c(bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("neutral: \u03b1"[A]~"=0; \u03b1"[B]~"=0")))+
+      geom_boxplot(alpha=0.9,size=0.75, color="#273746")
+    
+    ggsave(filename=paste0("boxplot_correlation_phylo_simul_1_",method,"_", correlation,"_nb_partners_constant_correlation_A.pdf"), device=cairo_pdf, plot = last_plot(), width = 8, height = 7)
+    
+    
+    # for tree B
+    
+    ggplot(results_signal,aes(x=param,y=mantel_cor_B,fill=size))+xlab("Parameters")+ylab("Mantel correlation (B)") +labs(title=" ")+scale_fill_manual(values=c("#27ae60","#7dcea0","#f4d03f","#f5b041","#e67e22","#ba4a00"))+transparent_theme_no + 
+      geom_hline(yintercept=0, linetype="dashed", color="#273746")+
+      scale_x_discrete(labels = c(bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("neutral: \u03b1"[A]~"=0; \u03b1"[B]~"=0")))+
+      geom_boxplot(alpha=0.9,size=0.75, color="#273746")
+    
+    ggsave(filename=paste0("boxplot_correlation_phylo_simul_1_",method,"_", correlation,"_nb_partners_constant_correlation_B.pdf"), device=cairo_pdf, plot = last_plot(), width = 8, height = 7)
+    
+    
+    library(dplyr)
+    brks <- c(0, 0.25, 0.5, 0.75, 1)
+    
+    results_signal$size <- as.factor(results_signal$size)
+    results_signal$size <-  factor(results_signal$size,levels(results_signal$size)[c(5,1,2,3,4,6)])
+    
+    results_signal$size_tot <- "<150"
+    results_signal$size_tot[which(results_signal$nb_A+results_signal$nb_B>=150)] <- "150-250"
+    results_signal$size_tot[which(results_signal$nb_A+results_signal$nb_B>250)] <- ">250"
+    
+    results_signal$size_tot <- as.factor(results_signal$size_tot)
+    results_signal$size_tot <-  factor(results_signal$size_tot,levels(results_signal$size_tot)[c(1,3,2)])
+    
+    
+    # for tree A
+    
+    results_signal$Inference <- "d) Not significant signal"
+    results_signal$Inference[which(results_signal$pvalue_high_A<0.05)] <- "e) Significant signal"
+    results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.05))] <- "f) Significant signal (R>0.05)"
+    results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.15))] <- "g) Significant signal (R>0.15)"
+    results_signal$Inference[which(results_signal$pvalue_low_A<0.05)] <- "c) Significant anti-signal"
+    results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.05)))] <- "b) Significant anti-signal (R<-0.05)"
+    results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.15)))] <- "a) Significant anti-signal (R<-0.15)"
+    
+    colors <- c()
+    if ("a) Significant anti-signal (R<-0.15)" %in% results_signal$Inference) {colors <- c(colors, "#943126")}
+    if ("b) Significant anti-signal (R<-0.05)" %in% results_signal$Inference) {colors <- c(colors, "#e74c3c")}
+    if ("c) Significant anti-signal" %in% results_signal$Inference) {colors <- c(colors, "#f1948a")}
+    if ("d) Not significant signal" %in% results_signal$Inference) {colors <- c(colors, "#f7dc6f")}
+    if ("e) Significant signal" %in% results_signal$Inference) {colors <- c(colors, "#7dcea0")}
+    if ("f) Significant signal (R>0.05)" %in% results_signal$Inference) {colors <- c(colors, "#27ae60")}
+    if ("g) Significant signal (R>0.15)" %in% results_signal$Inference) {colors <- c(colors, "#196f3d")}
+    
+    results_signal_all <- results_signal %>% 
+      group_by(param,Inference,size_tot) %>% 
+      summarise(count=n()) %>% 
+      mutate(perc=count/sum(count))
+    
+    results_signal_all$size_tot <- as.factor(results_signal_all$size_tot)
+    results_signal_all$size_tot <-  factor(results_signal_all$size_tot,levels(results_signal_all$size_tot)[c(1,2,3)])
+    
+    ggplot(results_signal_all,aes(x=param, y = count))+  geom_bar(position="fill", stat="identity", alpha=0.7, aes(fill=Inference,color=Inference))+
+      xlab("Parameters")+ylab("Percentage of simulated networks") +labs(title=" ")+scale_fill_manual(values=colors)+transparent_theme_no + 
+      scale_y_continuous(breaks = brks, labels = scales::percent(brks)) +
+      scale_color_manual(values=colors)+
+      scale_x_discrete(labels = c(bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("neutral: \u03b1"[A]~"=0; \u03b1"[B]~"=0")))+
+      facet_grid(~size_tot)
+    
+    ggsave(filename=paste0("boxplot_correlation_phylo_simul_1_",method,"_", correlation,"_nb_partners_constant_size_correlation_A.pdf"), device=cairo_pdf, plot = last_plot(), width = 11, height = 7)
+    
+    
+    
+    ##  Resume for clade B
+    
+    results_signal$Inference <- "d) Not significant signal"
+    results_signal$Inference[which(results_signal$pvalue_high_B<0.05)] <- "e) Significant signal"
+    results_signal$Inference[intersect(which(results_signal$pvalue_high_B<0.05), which(results_signal$mantel_cor_B>0.05))] <- "f) Significant signal (R>0.05)"
+    results_signal$Inference[intersect(which(results_signal$pvalue_high_B<0.05), which(results_signal$mantel_cor_B>0.15))] <- "g) Significant signal (R>0.15)"
+    results_signal$Inference[which(results_signal$pvalue_low_B<0.05)] <- "c) Significant anti-signal"
+    results_signal$Inference[intersect(which(results_signal$pvalue_low_B<0.05), which(results_signal$mantel_cor_B<(-0.05)))] <- "b) Significant anti-signal (R<-0.05)"
+    results_signal$Inference[intersect(which(results_signal$pvalue_low_B<0.05), which(results_signal$mantel_cor_B<(-0.15)))] <- "a) Significant anti-signal (R<-0.15)"
+    
+    colors <- c()
+    if ("a) Significant anti-signal (R<-0.15)" %in% results_signal$Inference) {colors <- c(colors, "#943126")}
+    if ("b) Significant anti-signal (R<-0.05)" %in% results_signal$Inference) {colors <- c(colors, "#e74c3c")}
+    if ("c) Significant anti-signal" %in% results_signal$Inference) {colors <- c(colors, "#f1948a")}
+    if ("d) Not significant signal" %in% results_signal$Inference) {colors <- c(colors, "#f7dc6f")}
+    if ("e) Significant signal" %in% results_signal$Inference) {colors <- c(colors, "#7dcea0")}
+    if ("f) Significant signal (R>0.05)" %in% results_signal$Inference) {colors <- c(colors, "#27ae60")}
+    if ("g) Significant signal (R>0.15)" %in% results_signal$Inference) {colors <- c(colors, "#196f3d")}
+    
+    
+    results_signal_all <- results_signal %>% 
+      group_by(param,Inference,size_tot) %>% 
+      summarise(count=n()) %>% 
+      mutate(perc=count/sum(count))
+    
+    results_signal_all$size_tot <- as.factor(results_signal_all$size_tot)
+    results_signal_all$size_tot <-  factor(results_signal_all$size_tot,levels(results_signal_all$size_tot)[c(1,2,3)])
+    
+    ggplot(results_signal_all,aes(x=param, y = count))+  geom_bar(position="fill", stat="identity", alpha=0.7, aes(fill=Inference,color=Inference))+
+      xlab("Parameters")+ylab("Percentage of simulated networks") +labs(title=" ")+scale_fill_manual(values=colors)+transparent_theme_no + 
+      scale_y_continuous(breaks = brks, labels = scales::percent(brks)) +
+      scale_color_manual(values=colors)+
+      scale_x_discrete(labels = c(bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("neutral: \u03b1"[A]~"=0; \u03b1"[B]~"=0")))+
+      facet_grid(~size_tot)
+    
+    ggsave(filename=paste0("boxplot_correlation_phylo_simul_1_",method,"_", correlation,"_nb_partners_constant_size_correlation_B.pdf"), device=cairo_pdf, plot = last_plot(), width = 11, height = 7)
+    
+  }
+}
+
+#### Step 12-B: Simulate phylogenetic signal in generalism using degree and permutations (simul 3) ####
+
+rm(list=ls())
+
+library(vegan)
+library(phytools)
+library(ggplot2)
+library(GUniFrac)
+library(parallel)
+require(R.utils)
+
+setwd("/Users/bperez/Nextcloud/Recherche/These/ISYEB/signal_phylo/simul_3/")
+
+source("../script/function_phylo_signal_network.R")
+dyn.load("../script/permute.so")
+
+library(mvMORPH)
+library(reshape2)
+
+seed=1
+
+# "param_1" d_A=1 
+# "param_2" d_A=0.5
+# "param_3" d_A=0.05 
+# "param_4" d_A=0
+
+
+method="Jaccard_binary"
+
+for (method in c("Jaccard_binary", "UniFrac_unweighted")){
+  
+  results_signal <- c()
+  
+  for (param in paste0("param_",0:4)){
+    print(param)
+    
+    if (param=="param_0"){d_A=5  } 
+    if (param=="param_1"){d_A=1  }
+    if (param=="param_2"){d_A=0.5  }
+    if (param=="param_3"){d_A=0.05}
+    if (param=="param_4"){d_A=0  }
+
+    for (seed in 1:100){
+      
+      print(seed)
+      
+      # simulate phylogenies
+      
+      set.seed(seed)
+      nb_A <- floor(runif(1, 40, 150))
+      nb_B <- floor(runif(1, 40, 150))
+      
+      tree_A <- phytools::pbtree(n=nb_A)
+      tree_B <- phytools::pbtree(n=nb_B)
+      
+      # scale branch length
+      tree_A$edge.length <- tree_A$edge.length/max(node.depth.edgelength(tree_A))
+      tree_B$edge.length <- tree_B$edge.length/max(node.depth.edgelength(tree_B))
+      
+      # simulate OU with mean of 0 (theta=0), variance of 0.1 (noise of the brownian motion) and  a parameter of attraction toward 0, d (central tendency)
+      
+      if (d_A!="star"){
+        if (d_A!="0"){
+          data_A <- mvSIM(tree_A, param=list(sigma=0.1, alpha=d_A, ntraits=1, theta=0), model="OU1", nsim=1)
+        }else{ # brownian motion
+          data_A <- mvSIM(tree_A, param=list(sigma=0.1, ntraits=1, theta=0), model="BM1", nsim=1)
+        }
+      }else{
+        star_tree <- di2multi(pbtree(n=Ntip(tree_A)), tol = 10000000)
+        star_tree$edge.length <- rep(1,length(star_tree$edge.length))
+        data_A <- mvSIM( star_tree, param=list(sigma=0.1, alpha=1, ntraits=1, theta=0), model="OU1", nsim=1)
+      }
+      
+      data_A <- round( 1+(abs(data_A)-min(abs(data_A)))/(max(abs(data_A))-min(abs(data_A)))*(nb_B-1)) # new
+      
+      if (min(data_A)<1) { print("problem")}
+      
+      network <- matrix(0, nrow=Ntip(tree_B), ncol= Ntip(tree_A))
+      colnames(network) <- tree_A$tip.label
+      rownames(network) <- tree_B$tip.label
+      
+      for (i in 1:nrow(data_A)){
+        
+        network[sample(1:nrow(network), size = data_A[i], replace = F), rownames(data_A)[i]] <- 1
+        
+      }
+      
+      colSums(network)==data_A
+      rowSums(network)
+      
+      # Remove species if no interactions
+      network <- network[,colSums(network)>0]
+      network <- network[rowSums(network)>0,]
+      tree_B <- drop.tip(tree_B, tip=tree_B$tip.label[!tree_B$tip.label %in% rownames(network)])
+      tree_A <- drop.tip(tree_A, tip=tree_A$tip.label[!tree_A$tip.label %in% colnames(network)])
+      
+      
+      network <- network[tree_B$tip.label,tree_A$tip.label]
+      
+      # Ecological matrix
+      # binary Jaccard distances
+      if (method=="Jaccard_binary"){
+        jaccard_A <- as.matrix(vegan::vegdist(t(network), "jaccard", binary=T))
+        jaccard_B <- as.matrix(vegan::vegdist(network, "jaccard", binary=T))
+        eco_A <- jaccard_A
+        eco_B <- jaccard_B
+      }
+      
+      # quantitative Jaccard distances
+      if (method=="Jaccard_weighted"){
+        jaccard_A <- as.matrix(vegan::vegdist(t(network), "jaccard", binary=F))
+        jaccard_B <- as.matrix(vegan::vegdist(network, "jaccard", binary=F))
+        eco_A <- jaccard_A
+        eco_B <- jaccard_B
+      }
+      
+      # Unifrac (generalized UniFrac, with alpha=0.5)
+      if (method=="GUniFrac"){
+        unifrac_B <- GUniFrac::GUniFrac(network, tree = tree_A)
+        unifrac_A <- GUniFrac::GUniFrac(t(network), tree = tree_B)
+        index=2
+        eco_A <- unifrac_A$unifracs[,,index]
+        eco_B <- unifrac_B$unifracs[,,index]
+      }
+      
+      # Unifrac (unweighted UniFrac)
+      if (method=="UniFrac_unweighted"){
+        unifrac_B <- GUniFrac::GUniFrac(network, tree = tree_A)
+        unifrac_A <- GUniFrac::GUniFrac(t(network), tree = tree_B)
+        index=4
+        eco_A <- unifrac_A$unifracs[,,index]
+        eco_B <- unifrac_B$unifracs[,,index]
+      }
+      
+      # Degree matrix 
+      network_binary <- network
+      network_binary[network_binary>0] <- 1 # makes binary
+      
+      # cophenetic distances
+      cophe_A <- cophenetic.phylo(tree_A)
+      cophe_B <- cophenetic.phylo(tree_B)
+      
+      # Mantel tests (Pearson)
+      mantel_A_partial <- ecodist::mantel(as.dist(cophe_A) ~ as.dist(eco_A) + dist(colSums(network_binary)),  nperm = 10000, mrank=F, nboot = 0) # Pearson
+      mantel_A_identity <- ecodist::mantel(as.dist(cophe_A) ~ as.dist(eco_A) ,  nperm = 10000, mrank=F, nboot = 0) # Pearson
+      mantel_A_degree <- ecodist::mantel(as.dist(cophe_A) ~ dist(colSums(network_binary)),  nperm = 10000, mrank=F, nboot = 0) # Pearson
+      
+      
+      # Perform permutations
+      res <- phylosignal_network(network, tree_A, tree_B, method = method, 
+                                 nperm = 1000, correlation = "Pearson", only_A = TRUE, permutation ="nbpartners")
+      mantel_A_nbpart <- res[3:5]
+      
+      
+      
+      # Mantel test (Pearson)
+      mantel_A_eco <- ecodist::mantel(as.dist(eco_A) ~ dist(colSums(network_binary)),  nperm = 10000, mrank=F, nboot = 0) 
+      
+      results_signal <- rbind(results_signal, c(param, seed, d_A, Ntip(tree_A), Ntip(tree_B), length(which(network>0))/(ncol(network)*nrow(network)) , round(mantel_A_partial[1:3],4), round(mantel_A_identity[1:3],4), round(mantel_A_degree[1:3],4), round(mantel_A_eco[1:3],4),  round(mantel_A_nbpart[1:3],4)   )) 
+      
+    }}
+  
+  results_signal <- data.frame(results_signal)
+  
+  colnames(results_signal) <- c("param","seed","d_A", #"d_B", 
+                                "nb_A","nb_B","connectance",
+                                "partial_mantel_cor_A","partial_pvalue_high_A","partial_pvalue_low_A",
+                                "identity_mantel_cor_A","identity_pvalue_high_A","identity_pvalue_low_A",
+                                "degree_mantel_cor_A","degree_pvalue_high_A","degree_pvalue_low_A",
+                                "eco_mantel_cor_A","eco_pvalue_high_A","eco_pvalue_low_A",
+                                "nbpart_mantel_cor_A","nbpart_pvalue_high_A","nbpart_pvalue_low_A") #,
+  
+  write.table(results_signal,paste0("results_generalism_partial_Mantel_test_degree_new_permut_simul_3_new_simul_",method,".csv"), quote=F, sep=";",row.names=F)
+  
+  
+  hist(as.numeric(as.character(results_signal$partial_pvalue_high_A)))
+  hist(as.numeric(as.character(results_signal$identity_pvalue_high_A)))
+  hist(as.numeric(as.character(results_signal$degree_pvalue_high_A)))
+  
+  print(table(as.numeric(as.character(results_signal$partial_pvalue_high_A))<0.05))
+  print(table(as.numeric(as.character(results_signal$identity_pvalue_high_A))<0.05))
+  print(table(as.numeric(as.character(results_signal$degree_pvalue_high_A))<0.05))
+  
+}
+
+
+
+#### Plot results  #####
+
+
+rm(list=ls()) # on computer
+
+library(ggplot2)
+library(vegan)
+library(phytools)
+library(ggplot2)
+library(GUniFrac)
+library(parallel)
+require(R.utils)
+library(dplyr)
+brks <- c(0, 0.25, 0.5, 0.75, 1)
+
+setwd("/Users/bperez/Nextcloud/Recherche/These/ISYEB/signal_phylo/simul_3/")
+
+dyn.load("../script/permute.so")
+source("../script/function_phylo_signal_network.R")
+
+
+transparent_theme_no <- theme(panel.grid = element_blank(),
+                              axis.line = element_line("black"),
+                              panel.background = element_rect(fill = "transparent",colour = NA),
+                              plot.background = element_rect(fill = "transparent",colour = NA),
+                              legend.key=element_blank(),legend.background=element_blank(),
+                              axis.text.x = element_text(angle = 60, hjust = 1,size=8) ,
+                              axis.title=element_text(face="bold",family="Helvetica",size=10),axis.text=element_text(face="bold"), legend.text = element_text(face="bold"), legend.title = element_text(face="bold"))
+correlation="Pearson"
+
+method="GUniFrac"
+
+for (method in c("Jaccard_binary","UniFrac_unweighted")){ #"GUniFrac",   "Jaccard_weighted",
+  
+  results_all <- read.table(paste0("results_generalism_partial_Mantel_test_degree_new_permut_simul_3_new_simul_",method,".csv"), header=T,sep=";")
+  
+  
+  results_all$param <- as.character(results_all$param)
+  results_all$seed <- as.character(results_all$seed)
+  results_all$nb_A <- as.numeric(as.character(results_all$nb_A))
+  results_all$nb_B <- as.numeric(as.character(results_all$nb_B))
+  
+  
+  results_all$partial_mantel_cor_A <- as.numeric(as.character(results_all$partial_mantel_cor_A))
+  results_all$partial_pvalue_high_A <- as.numeric(as.character(results_all$partial_pvalue_high_A))
+  results_all$partial_pvalue_low_A <- as.numeric(as.character(results_all$partial_pvalue_low_A))
+  results_all$identity_mantel_cor_A <- as.numeric(as.character(results_all$identity_mantel_cor_A))
+  results_all$identity_pvalue_high_A <- as.numeric(as.character(results_all$identity_pvalue_high_A))
+  results_all$identity_pvalue_low_A <- as.numeric(as.character(results_all$identity_pvalue_low_A))
+  results_all$degree_mantel_cor_A <- as.numeric(as.character(results_all$degree_mantel_cor_A))
+  results_all$degree_pvalue_high_A <- as.numeric(as.character(results_all$degree_pvalue_high_A))
+  results_all$degree_pvalue_low_A <- as.numeric(as.character(results_all$degree_pvalue_low_A))
+  results_all$nbpart_mantel_cor_A <- as.numeric(as.character(results_all$nbpart_mantel_cor_A))
+  results_all$nbpart_pvalue_high_A <- as.numeric(as.character(results_all$nbpart_pvalue_high_A))
+  results_all$nbpart_pvalue_low_A <- as.numeric(as.character(results_all$nbpart_pvalue_low_A))
+  results_all$eco_mantel_cor_A <- as.numeric(as.character(results_all$eco_mantel_cor_A))
+  results_all$eco_pvalue_high_A <- as.numeric(as.character(results_all$eco_pvalue_high_A))
+  results_all$eco_pvalue_low_A <- as.numeric(as.character(results_all$eco_pvalue_low_A))
+  
+  
+  # Plot 
+  results_signal <- results_all
+  
+  results_signal$size_tot <- "<150"
+  results_signal$size_tot[which(results_signal$nb_A+results_signal$nb_B>=150)] <- "150-200"
+  results_signal$size_tot[which(results_signal$nb_A+results_signal$nb_B>200)] <- ">200"
+  
+  results_signal$size_tot <- as.factor(results_signal$size_tot)
+  results_signal$size_tot <-  factor(results_signal$size_tot,levels(results_signal$size_tot)[c(1,3,2)])
+  
+  
+  test="partial_Mantel_test"
+  
+  # for tree A
+  results_signal$mantel_cor_A <- results_signal$partial_mantel_cor_A
+  results_signal$pvalue_high_A <- results_signal$partial_pvalue_high_A
+  results_signal$pvalue_low_A <- results_signal$partial_pvalue_low_A
+  
+  results_signal$Inference <- "d) Not significant signal"
+  results_signal$Inference[which(results_signal$pvalue_high_A<0.05)] <- "e) Significant signal"
+  results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.05))] <- "f) Significant signal (R>0.05)"
+  results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.15))] <- "g) Significant signal (R>0.15)"
+  results_signal$Inference[which(results_signal$pvalue_low_A<0.05)] <- "c) Significant anti-signal"
+  results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.05)))] <- "b) Significant anti-signal (R<-0.05)"
+  results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.15)))] <- "a) Significant anti-signal (R<-0.15)"
+  
+  colors <- c()
+  if ("a) Significant anti-signal (R<-0.15)" %in% results_signal$Inference) {colors <- c(colors, "#943126")}
+  if ("b) Significant anti-signal (R<-0.05)" %in% results_signal$Inference) {colors <- c(colors, "#e74c3c")}
+  if ("c) Significant anti-signal" %in% results_signal$Inference) {colors <- c(colors, "#f1948a")}
+  if ("d) Not significant signal" %in% results_signal$Inference) {colors <- c(colors, "#f7dc6f")}
+  if ("e) Significant signal" %in% results_signal$Inference) {colors <- c(colors, "#7dcea0")}
+  if ("f) Significant signal (R>0.05)" %in% results_signal$Inference) {colors <- c(colors, "#27ae60")}
+  if ("g) Significant signal (R>0.15)" %in% results_signal$Inference) {colors <- c(colors, "#196f3d")}
+  
+  results_signal_all <- results_signal %>% 
+    group_by(param,Inference,size_tot) %>% 
+    summarise(count=n()) %>% 
+    mutate(perc=count/sum(count))
+  
+  ggplot(results_signal_all,aes(x=param, y = count))+  geom_bar(position="fill", stat="identity", alpha=0.7, aes(fill=Inference,color=Inference))+
+    xlab("Parameters")+ylab("Percentage of simulated networks") +labs(title=" ")+scale_fill_manual(values=colors)+transparent_theme_no + 
+    scale_y_continuous(breaks = brks, labels = scales::percent(brks)) +
+    scale_color_manual(values=colors)+
+    scale_x_discrete(labels = c(bquote(" a"[A]~"=5"),
+                                bquote(" a"[A]~"=1"),
+                                bquote(" a"[A]~"=0.5"),
+                                bquote(" a"[A]~"=0.05"),
+                                bquote(" a"[A]~"=0")))+
+    facet_grid(~size_tot)
+  
+  ggsave(filename=paste0("boxplot_new_simul_phylogenetic_signal_generalism_",test,"_simul_3_",method,"_", correlation,"_inference_size_tot_anticorrelation_clade_A.pdf"), device=cairo_pdf, plot = last_plot(), width = 8, height = 5)
+  
+  
+  test="simple_Mantel_test_identity"
+  
+  # for tree A
+  results_signal$mantel_cor_A <- results_signal$identity_mantel_cor_A
+  results_signal$pvalue_high_A <- results_signal$identity_pvalue_high_A
+  results_signal$pvalue_low_A <- results_signal$identity_pvalue_low_A
+  
+  results_signal$Inference <- "d) Not significant signal"
+  results_signal$Inference[which(results_signal$pvalue_high_A<0.05)] <- "e) Significant signal"
+  results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.05))] <- "f) Significant signal (R>0.05)"
+  results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.15))] <- "g) Significant signal (R>0.15)"
+  results_signal$Inference[which(results_signal$pvalue_low_A<0.05)] <- "c) Significant anti-signal"
+  results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.05)))] <- "b) Significant anti-signal (R<-0.05)"
+  results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.15)))] <- "a) Significant anti-signal (R<-0.15)"
+  
+  colors <- c()
+  if ("a) Significant anti-signal (R<-0.15)" %in% results_signal$Inference) {colors <- c(colors, "#943126")}
+  if ("b) Significant anti-signal (R<-0.05)" %in% results_signal$Inference) {colors <- c(colors, "#e74c3c")}
+  if ("c) Significant anti-signal" %in% results_signal$Inference) {colors <- c(colors, "#f1948a")}
+  if ("d) Not significant signal" %in% results_signal$Inference) {colors <- c(colors, "#f7dc6f")}
+  if ("e) Significant signal" %in% results_signal$Inference) {colors <- c(colors, "#7dcea0")}
+  if ("f) Significant signal (R>0.05)" %in% results_signal$Inference) {colors <- c(colors, "#27ae60")}
+  if ("g) Significant signal (R>0.15)" %in% results_signal$Inference) {colors <- c(colors, "#196f3d")}
+  
+  results_signal_all <- results_signal %>% 
+    group_by(param,Inference,size_tot) %>% 
+    summarise(count=n()) %>% 
+    mutate(perc=count/sum(count))
+  
+  ggplot(results_signal_all,aes(x=param, y = count))+  geom_bar(position="fill", stat="identity", alpha=0.7, aes(fill=Inference,color=Inference))+
+    xlab("Parameters")+ylab("Percentage of simulated networks") +labs(title=" ")+scale_fill_manual(values=colors)+transparent_theme_no + 
+    scale_y_continuous(breaks = brks, labels = scales::percent(brks)) +
+    scale_color_manual(values=colors)+
+    scale_x_discrete(labels = c(bquote(" a"[A]~"=5"),
+                                bquote(" a"[A]~"=1"),
+                                bquote(" a"[A]~"=0.5"),
+                                bquote(" a"[A]~"=0.05"),
+                                bquote(" a"[A]~"=0")))+
+    facet_grid(~size_tot)
+  
+  ggsave(filename=paste0("boxplot_new_simul_phylogenetic_signal_generalism_",test,"_simul_3_",method,"_", correlation,"_inference_size_tot_anticorrelation_clade_A.pdf"), device=cairo_pdf, plot = last_plot(), width = 8, height = 5)
+  
+  
+  
+  test="simple_Mantel_test_degree"
+  
+  # for tree A
+  results_signal$mantel_cor_A <- results_signal$degree_mantel_cor_A
+  results_signal$pvalue_high_A <- results_signal$degree_pvalue_high_A
+  results_signal$pvalue_low_A <- results_signal$degree_pvalue_low_A
+  
+  results_signal$Inference <- "d) Not significant signal"
+  results_signal$Inference[which(results_signal$pvalue_high_A<0.05)] <- "e) Significant signal"
+  results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.05))] <- "f) Significant signal (R>0.05)"
+  results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.15))] <- "g) Significant signal (R>0.15)"
+  results_signal$Inference[which(results_signal$pvalue_low_A<0.05)] <- "c) Significant anti-signal"
+  results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.05)))] <- "b) Significant anti-signal (R<-0.05)"
+  results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.15)))] <- "a) Significant anti-signal (R<-0.15)"
+  
+  colors <- c()
+  if ("a) Significant anti-signal (R<-0.15)" %in% results_signal$Inference) {colors <- c(colors, "#943126")}
+  if ("b) Significant anti-signal (R<-0.05)" %in% results_signal$Inference) {colors <- c(colors, "#e74c3c")}
+  if ("c) Significant anti-signal" %in% results_signal$Inference) {colors <- c(colors, "#f1948a")}
+  if ("d) Not significant signal" %in% results_signal$Inference) {colors <- c(colors, "#f7dc6f")}
+  if ("e) Significant signal" %in% results_signal$Inference) {colors <- c(colors, "#7dcea0")}
+  if ("f) Significant signal (R>0.05)" %in% results_signal$Inference) {colors <- c(colors, "#27ae60")}
+  if ("g) Significant signal (R>0.15)" %in% results_signal$Inference) {colors <- c(colors, "#196f3d")}
+  
+  results_signal_all <- results_signal %>% 
+    group_by(param,Inference,size_tot) %>% 
+    summarise(count=n()) %>% 
+    mutate(perc=count/sum(count))
+  
+  ggplot(results_signal_all,aes(x=param, y = count))+  geom_bar(position="fill", stat="identity", alpha=0.7, aes(fill=Inference,color=Inference))+
+    xlab("Parameters")+ylab("Percentage of simulated networks") +labs(title=" ")+scale_fill_manual(values=colors)+transparent_theme_no + 
+    scale_y_continuous(breaks = brks, labels = scales::percent(brks)) +
+    scale_color_manual(values=colors)+
+    scale_x_discrete(labels = c(bquote(" a"[A]~"=5"),
+                                bquote(" a"[A]~"=1"),
+                                bquote(" a"[A]~"=0.5"),
+                                bquote(" a"[A]~"=0.05"),
+                                bquote(" a"[A]~"=0")))+
+    facet_grid(~size_tot)
+  
+  ggsave(filename=paste0("boxplot_new_simul_phylogenetic_signal_generalism_",test,"_simul_3_",method,"_", correlation,"_inference_size_tot_anticorrelation_clade_A.pdf"), device=cairo_pdf, plot = last_plot(), width = 8, height = 5)
+  
+  
+  
+  
+  test="simple_Mantel_test_permut_nbpart"
+  
+  # for tree A
+  results_signal$mantel_cor_A <- results_signal$nbpart_mantel_cor_A
+  results_signal$pvalue_high_A <- results_signal$nbpart_pvalue_high_A
+  results_signal$pvalue_low_A <- results_signal$nbpart_pvalue_low_A
+  
+  results_signal$Inference <- "d) Not significant signal"
+  results_signal$Inference[which(results_signal$pvalue_high_A<0.05)] <- "e) Significant signal"
+  results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.05))] <- "f) Significant signal (R>0.05)"
+  results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.15))] <- "g) Significant signal (R>0.15)"
+  results_signal$Inference[which(results_signal$pvalue_low_A<0.05)] <- "c) Significant anti-signal"
+  results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.05)))] <- "b) Significant anti-signal (R<-0.05)"
+  results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.15)))] <- "a) Significant anti-signal (R<-0.15)"
+  
+  colors <- c()
+  if ("a) Significant anti-signal (R<-0.15)" %in% results_signal$Inference) {colors <- c(colors, "#943126")}
+  if ("b) Significant anti-signal (R<-0.05)" %in% results_signal$Inference) {colors <- c(colors, "#e74c3c")}
+  if ("c) Significant anti-signal" %in% results_signal$Inference) {colors <- c(colors, "#f1948a")}
+  if ("d) Not significant signal" %in% results_signal$Inference) {colors <- c(colors, "#f7dc6f")}
+  if ("e) Significant signal" %in% results_signal$Inference) {colors <- c(colors, "#7dcea0")}
+  if ("f) Significant signal (R>0.05)" %in% results_signal$Inference) {colors <- c(colors, "#27ae60")}
+  if ("g) Significant signal (R>0.15)" %in% results_signal$Inference) {colors <- c(colors, "#196f3d")}
+  
+  results_signal_all <- results_signal %>% 
+    group_by(param,Inference,size_tot) %>% 
+    summarise(count=n()) %>% 
+    mutate(perc=count/sum(count))
+  
+  ggplot(results_signal_all,aes(x=param, y = count))+  geom_bar(position="fill", stat="identity", alpha=0.7, aes(fill=Inference,color=Inference))+
+    xlab("Parameters")+ylab("Percentage of simulated networks") +labs(title=" ")+scale_fill_manual(values=colors)+transparent_theme_no + 
+    scale_y_continuous(breaks = brks, labels = scales::percent(brks)) +
+    scale_color_manual(values=colors)+
+    scale_x_discrete(labels = c(bquote(" a"[A]~"=5"),
+                                bquote(" a"[A]~"=1"),
+                                bquote(" a"[A]~"=0.5"),
+                                bquote(" a"[A]~"=0.05"),
+                                bquote(" a"[A]~"=0")))+
+    facet_grid(~size_tot)
+  
+  ggsave(filename=paste0("boxplot_new_simul_phylogenetic_signal_generalism_",test,"_simul_3_",method,"_", correlation,"_inference_size_tot_anticorrelation_clade_A.pdf"), device=cairo_pdf, plot = last_plot(), width = 8, height = 5)
+  
+  
+  
+  
+  #  plot eco
+  
+  test="correlation_eco_degree_Mantel_tests"
+  
+  ggplot(results_signal,aes(x=param,y=eco_mantel_cor_A,fill=size_tot))+xlab("Parameters")+ylab("Mantel correlation (A)") +labs(title=" ")+scale_fill_manual(values=c("#27ae60","#7dcea0","#f4d03f","#f5b041","#e67e22","#ba4a00"))+transparent_theme_no + 
+    geom_hline(yintercept=0, linetype="dashed", color="#273746")+
+    scale_x_discrete(labels = c(bquote(" a"[A]~"=5"),
+                                bquote(" a"[A]~"=1"),
+                                bquote(" a"[A]~"=0.5"),
+                                bquote(" a"[A]~"=0.05"),
+                                bquote(" a"[A]~"=0")))+
+    geom_boxplot(alpha=0.9,size=0.75, color="#273746")
+  
+  ggsave(filename=paste0("boxplot_new_simul_phylogenetic_signal_generalism_",test,"_simul_3_",method,"_", correlation,"_clade_A.pdf"), device=cairo_pdf, plot = last_plot(), width = 8, height = 5)
+  
+  
+  # for tree A
+  results_signal$mantel_cor_A <- results_signal$eco_mantel_cor_A
+  results_signal$pvalue_high_A <- results_signal$eco_pvalue_high_A
+  results_signal$pvalue_low_A <- results_signal$eco_pvalue_low_A
+  
+  results_signal$Inference <- "d) Not significant signal"
+  results_signal$Inference[which(results_signal$pvalue_high_A<0.05)] <- "e) Significant signal"
+  results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.05))] <- "f) Significant signal (R>0.05)"
+  results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.15))] <- "g) Significant signal (R>0.15)"
+  results_signal$Inference[which(results_signal$pvalue_low_A<0.05)] <- "c) Significant anti-signal"
+  results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.05)))] <- "b) Significant anti-signal (R<-0.05)"
+  results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.15)))] <- "a) Significant anti-signal (R<-0.15)"
+  
+  colors <- c()
+  if ("a) Significant anti-signal (R<-0.15)" %in% results_signal$Inference) {colors <- c(colors, "#943126")}
+  if ("b) Significant anti-signal (R<-0.05)" %in% results_signal$Inference) {colors <- c(colors, "#e74c3c")}
+  if ("c) Significant anti-signal" %in% results_signal$Inference) {colors <- c(colors, "#f1948a")}
+  if ("d) Not significant signal" %in% results_signal$Inference) {colors <- c(colors, "#f7dc6f")}
+  if ("e) Significant signal" %in% results_signal$Inference) {colors <- c(colors, "#7dcea0")}
+  if ("f) Significant signal (R>0.05)" %in% results_signal$Inference) {colors <- c(colors, "#27ae60")}
+  if ("g) Significant signal (R>0.15)" %in% results_signal$Inference) {colors <- c(colors, "#196f3d")}
+  
+  results_signal_all <- results_signal %>% 
+    group_by(param,Inference,size_tot) %>% 
+    summarise(count=n()) %>% 
+    mutate(perc=count/sum(count))
+  
+  ggplot(results_signal_all,aes(x=param, y = count))+  geom_bar(position="fill", stat="identity", alpha=0.7, aes(fill=Inference,color=Inference))+
+    xlab("Parameters")+ylab("Percentage of simulated networks") +labs(title=" ")+scale_fill_manual(values=colors)+transparent_theme_no + 
+    scale_y_continuous(breaks = brks, labels = scales::percent(brks)) +
+    scale_color_manual(values=colors)+
+    scale_x_discrete(labels = c(bquote(" a"[A]~"=5"),
+                                bquote(" a"[A]~"=1"),
+                                bquote(" a"[A]~"=0.5"),
+                                bquote(" a"[A]~"=0.05"),
+                                bquote(" a"[A]~"=0")))+
+    facet_grid(~size_tot)
+  
+  ggsave(filename=paste0("boxplot_new_simul_phylogenetic_signal_generalism_",test,"_simul_3_",method,"_", correlation,"_inference_size_tot_anticorrelation_clade_A.pdf"), device=cairo_pdf, plot = last_plot(), width = 8, height = 5)
+  
+  
+  
+  
+  print(method)
+  
+  results_all_A_restricted <- results_all_A[which(results_all_A$degree_pvalue_high_A<0.05),]
+  
+  print("type I error (simple Mantel test):")
+  print(length(which(results_all_A$identity_pvalue_high_A<0.05))/nrow(results_all_A))
+  print(length(which(results_all_A_restricted$identity_pvalue_high_A<0.05))/nrow(results_all_A_restricted))
+  
+  print("type I error (partial Mantel test):")
+  print(length(which(results_all_A$partial_pvalue_high_A<0.05))/nrow(results_all_A))
+  print(length(which(results_all_A_restricted$partial_pvalue_high_A<0.05))/nrow(results_all_A_restricted))
+  
+  print("type I error (Mantel tests keeping constant number of partners):")
+  print(length(which(results_all_A$nbpart_pvalue_high_A<0.05))/nrow(results_all_A))
+  print(length(which(results_all_A_restricted$nbpart_pvalue_high_A<0.05))/nrow(results_all_A_restricted))
+  
+}
+
+
+
+
+#### Step 13-A: Perform Mantel test with partition turnover  ####
+
+
+rm(list=ls())
+
+library(vegan)
+library(phytools)
+library(ggplot2)
+library(GUniFrac,lib.loc="/users/biodiv/bperez/packages/")
+library(parallel)
+require(R.utils)
+library(betapart,lib.loc="/users/biodiv/bperez/packages/")
+
+setwd("/users/biodiv/bperez/data/network_project/bipartite/simulations/simul_1")
+
+
+source("../script/function_phylo_signal_network.R")
+dyn.load("../script/permute.so")
+
+
+list_networks <- as.vector(outer(c("simul_1_A","simul_1_B","simul_1_C","simul_1_D","simul_1_E", "simul_1_F"), c(paste0("neutral_seed_",1:100), paste0("mutualism_", as.vector(outer(1:6, 1:20, paste, sep="_seed_"))), paste0("antagonism_",as.vector(outer(1:9, 1:20, paste, sep="_seed_")))), paste, sep="_"))
+
+
+nb_cores=10
+
+compute_phylo_signal <- function(name, method, correlation, nperm){
+  
+  print(name)
+  network <- read.table(paste0("network_",name,".csv"), header=T,sep=";")
+  
+  colnames(network) <- seq(1:ncol(network))
+  rownames(network) <- seq(1:nrow(network))
+  
+  tree_A <- read.tree(paste0("network_tree_guild_A_",name,".tre"))
+  tree_B <- read.tree(paste0("network_tree_guild_B_",name,".tre"))
+  
+  network <- network[tree_B$tip.label,tree_A$tip.label]
+  
+  ####  Need to be binary 
+  network[network>0] <- 1
+  
+  
+  ### For A:
+  core <- betapart::betapart.core(t(network))
+  beta_div <- betapart::beta.pair(core, index.family="jaccard")
+  
+  ### Mantel test:
+  cophe_A <- cophenetic.phylo(tree_A)
+  turnover_A <- beta_div$beta.jtu
+  turnover_A <- as.matrix(turnover_A)
+  turnover_A <- turnover_A[rownames(cophe_A), colnames(cophe_A)]
+  
+  res_A <- ecodist::mantel(as.dist(cophe_A) ~ as.dist(turnover_A),  nperm = 10000, mrank=correlation, nboot = 0) 
+  
+  
+  ### For B:
+  core <- betapart::betapart.core(network)
+  beta_div <- betapart::beta.pair(core, index.family="jaccard")
+  
+  ### Mantel test:
+  cophe_B <- cophenetic.phylo(tree_B)
+  turnover_B <- beta_div$beta.jtu
+  turnover_B <- as.matrix(turnover_B)
+  turnover_B <- turnover_B[rownames(cophe_B), colnames(cophe_B)]
+  
+  res_B <- ecodist::mantel(as.dist(cophe_B) ~ as.dist(turnover_B),  nperm = 10000, mrank=correlation, nboot = 0) 
+  
+  res <- c(Ntip(tree_A),Ntip(tree_B),round(res_A[1:3],4),round(res_B[1:3],4))
+  
+  return(res)
+}
+
+
+method="Jaccard_binary"
+
+
+for (correlation in c("Pearson", "Spearman")){
+  
+  nperm=10000
+  
+  if (correlation=="Pearson") mrank=FALSE
+  if (correlation=="Spearman") mrank=TRUE
+  
+  results_signal <- matrix(unlist(mclapply(list_networks,compute_phylo_signal,mc.cores=nb_cores, mc.preschedule=F, method=method, correlation=mrank, nperm=nperm)),nrow=length(list_networks),byrow=T)
+  results_signal <- cbind(list_networks, results_signal)
+  results_signal <- data.frame(results_signal, stringsAsFactors =F)
+  colnames(results_signal) <- c("name","nb_A", "nb_B", "mantel_cor_A","pvalue_high_A","pvalue_low_A", "mantel_cor_B", "pvalue_high_B", "pvalue_low_B")
+  
+  results_signal$size <- "A"
+  results_signal$size[grep(pattern = "_B_", results_signal$name)] <- "B"
+  results_signal$size[grep(pattern = "_C_", results_signal$name)] <- "C"
+  results_signal$size[grep(pattern = "_D_", results_signal$name)] <- "D"
+  results_signal$size[grep(pattern = "_E_", results_signal$name)] <- "E"
+  results_signal$size[grep(pattern = "_F_", results_signal$name)] <- "F"
+  results_signal$param <- "neutral"
+  results_signal$param[grep(pattern = "_antagonism_1_", results_signal$name)] <- "antagonism_1"
+  results_signal$param[grep(pattern = "_antagonism_2_", results_signal$name)] <- "antagonism_2"
+  results_signal$param[grep(pattern = "_antagonism_3_", results_signal$name)] <- "antagonism_3"
+  results_signal$param[grep(pattern = "_antagonism_4_", results_signal$name)] <- "antagonism_4"
+  results_signal$param[grep(pattern = "_antagonism_5_", results_signal$name)] <- "antagonism_5"
+  results_signal$param[grep(pattern = "_antagonism_6_", results_signal$name)] <- "antagonism_6"
+  results_signal$param[grep(pattern = "_antagonism_7_", results_signal$name)] <- "antagonism_7"
+  results_signal$param[grep(pattern = "_antagonism_8_", results_signal$name)] <- "antagonism_8"
+  results_signal$param[grep(pattern = "_antagonism_9_", results_signal$name)] <- "antagonism_9"
+  results_signal$param[grep(pattern = "_mutualism_1_", results_signal$name)] <- "mutualism_1"
+  results_signal$param[grep(pattern = "_mutualism_2_", results_signal$name)] <- "mutualism_2"
+  results_signal$param[grep(pattern = "_mutualism_3_", results_signal$name)] <- "mutualism_3"
+  results_signal$param[grep(pattern = "_mutualism_4_", results_signal$name)] <- "mutualism_4"
+  results_signal$param[grep(pattern = "_mutualism_5_", results_signal$name)] <- "mutualism_5"
+  results_signal$param[grep(pattern = "_mutualism_6_", results_signal$name)] <- "mutualism_6"
+  
+  write.table(results_signal,paste0("results_phylogenetic_signal_simul_1_",method,"_", correlation,"_partition_turnover_jaccard.csv"), quote=F, sep=";",row.names=F)
+  
+}
+
+#### Plot results ####
+
+
+rm(list=ls()) 
+
+library(ggplot2)
+library(vegan)
+library(phytools)
+library(ggplot2)
+library(GUniFrac,lib.loc="/users/biodiv/bperez/packages/")
+library(parallel)
+require(R.utils)
+
+setwd("/users/biodiv/bperez/data/network_project/bipartite/simulations/simul_1")
+
+dyn.load("../script/permute.so")
+source("../script/function_phylo_signal_network.R")
+
+transparent_theme_no <- theme(panel.grid = element_blank(),
+                              axis.line = element_line("black"),
+                              panel.background = element_rect(fill = "transparent",colour = NA),
+                              plot.background = element_rect(fill = "transparent",colour = NA),
+                              legend.key=element_blank(),legend.background=element_blank(),
+                              axis.text.x = element_text(angle = 60, hjust = 1,size=8) ,
+                              axis.title=element_text(face="bold",family="Helvetica",size=10),axis.text=element_text(face="bold"), legend.text = element_text(face="bold"), legend.title = element_text(face="bold"))
+
+
+
+
+for (correlation in c("Pearson", "Spearman")){
+  
+  for (method in c("Jaccard_binary")){
+    
+    results_all <- read.table(paste0("results_phylogenetic_signal_simul_1_",method,"_", correlation,"_partition_turnover_jaccard.csv"), header=T,sep=";")
+    
+    
+    results_all$param <- as.character(results_all$param)
+    results_all$size <- as.character(results_all$size)
+    results_all$mantel_cor_A <- as.numeric(as.character(results_all$mantel_cor_A))
+    results_all$pvalue_high_A <- as.numeric(as.character(results_all$pvalue_high_A))
+    results_all$mantel_cor_B <- as.numeric(as.character(results_all$mantel_cor_B))
+    results_all$pvalue_high_B <- as.numeric(as.character(results_all$pvalue_high_B))
+    results_all$nb_A <- as.numeric(as.character(results_all$nb_A))
+    results_all$nb_B <- as.numeric(as.character(results_all$nb_B))
+    
+    print(method)
+    print("A")
+    print(length(intersect(which(results_all$pvalue_high_A<0.05), which(results_all$mantel_cor_A>0.10))))  
+    
+    print("B")
+    print(length(intersect(which(results_all$pvalue_high_B<0.05), which(results_all$mantel_cor_B>0.10))))  
+    
+    # Plot 
+    results_signal <- results_all
+    
+    
+    # for tree A
+    
+    results_signal$size <- as.factor(results_signal$size)
+    results_signal$size <-  factor(results_signal$size,levels(results_signal$size)[c(5,1,2,3,4,6)])
+    
+    ggplot(results_signal,aes(x=param,y=mantel_cor_A,fill=size))+xlab("Parameters")+ylab("Mantel correlation (A)") +labs(title=" ")+scale_fill_manual(values=c("#27ae60","#7dcea0","#f4d03f","#f5b041","#e67e22","#ba4a00"))+transparent_theme_no + 
+      geom_hline(yintercept=0, linetype="dashed", color="#273746")+
+      scale_x_discrete(labels = c(bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("neutral: \u03b1"[A]~"=0; \u03b1"[B]~"=0")))+
+      geom_boxplot(alpha=0.9,size=0.75, color="#273746")
+    
+    ggsave(filename=paste0("boxplot_correlation_phylo_simul_1_",method,"_", correlation,"_partition_turnover_jaccard_correlation_A.pdf"), device=cairo_pdf, plot = last_plot(), width = 8, height = 7)
+    
+    
+    # for tree B
+    
+    ggplot(results_signal,aes(x=param,y=mantel_cor_B,fill=size))+xlab("Parameters")+ylab("Mantel correlation (B)") +labs(title=" ")+scale_fill_manual(values=c("#27ae60","#7dcea0","#f4d03f","#f5b041","#e67e22","#ba4a00"))+transparent_theme_no + 
+      geom_hline(yintercept=0, linetype="dashed", color="#273746")+
+      scale_x_discrete(labels = c(bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("neutral: \u03b1"[A]~"=0; \u03b1"[B]~"=0")))+
+      geom_boxplot(alpha=0.9,size=0.75, color="#273746")
+    
+    ggsave(filename=paste0("boxplot_correlation_phylo_simul_1_",method,"_", correlation,"_partition_turnover_jaccard_correlation_B.pdf"), device=cairo_pdf, plot = last_plot(), width = 8, height = 7)
+    
+    
+    library(dplyr)
+    brks <- c(0, 0.25, 0.5, 0.75, 1)
+    
+    results_signal$size <- as.factor(results_signal$size)
+    results_signal$size <-  factor(results_signal$size,levels(results_signal$size)[c(5,1,2,3,4,6)])
+    
+    results_signal$size_tot <- "<150"
+    results_signal$size_tot[which(results_signal$nb_A+results_signal$nb_B>=150)] <- "150-250"
+    results_signal$size_tot[which(results_signal$nb_A+results_signal$nb_B>250)] <- ">250"
+    
+    results_signal$size_tot <- as.factor(results_signal$size_tot)
+    results_signal$size_tot <-  factor(results_signal$size_tot,levels(results_signal$size_tot)[c(1,3,2)])
+    
+    
+    # for tree A
+    
+    results_signal$Inference <- "d) Not significant signal"
+    results_signal$Inference[which(results_signal$pvalue_high_A<0.05)] <- "e) Significant signal"
+    results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.05))] <- "f) Significant signal (R>0.05)"
+    results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.15))] <- "g) Significant signal (R>0.15)"
+    results_signal$Inference[which(results_signal$pvalue_low_A<0.05)] <- "c) Significant anti-signal"
+    results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.05)))] <- "b) Significant anti-signal (R<-0.05)"
+    results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.15)))] <- "a) Significant anti-signal (R<-0.15)"
+    
+    colors <- c()
+    if ("a) Significant anti-signal (R<-0.15)" %in% results_signal$Inference) {colors <- c(colors, "#943126")}
+    if ("b) Significant anti-signal (R<-0.05)" %in% results_signal$Inference) {colors <- c(colors, "#e74c3c")}
+    if ("c) Significant anti-signal" %in% results_signal$Inference) {colors <- c(colors, "#f1948a")}
+    if ("d) Not significant signal" %in% results_signal$Inference) {colors <- c(colors, "#f7dc6f")}
+    if ("e) Significant signal" %in% results_signal$Inference) {colors <- c(colors, "#7dcea0")}
+    if ("f) Significant signal (R>0.05)" %in% results_signal$Inference) {colors <- c(colors, "#27ae60")}
+    if ("g) Significant signal (R>0.15)" %in% results_signal$Inference) {colors <- c(colors, "#196f3d")}
+    
+    results_signal_all <- results_signal %>% 
+      group_by(param,Inference,size_tot) %>% 
+      summarise(count=n()) %>% 
+      mutate(perc=count/sum(count))
+    
+    results_signal_all$size_tot <- as.factor(results_signal_all$size_tot)
+    results_signal_all$size_tot <-  factor(results_signal_all$size_tot,levels(results_signal_all$size_tot)[c(1,2,3)])
+    
+    ggplot(results_signal_all,aes(x=param, y = count))+  geom_bar(position="fill", stat="identity", alpha=0.7, aes(fill=Inference,color=Inference))+
+      xlab("Parameters")+ylab("Percentage of simulated networks") +labs(title=" ")+scale_fill_manual(values=colors)+transparent_theme_no + 
+      scale_y_continuous(breaks = brks, labels = scales::percent(brks)) +
+      scale_color_manual(values=colors)+
+      scale_x_discrete(labels = c(bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("neutral: \u03b1"[A]~"=0; \u03b1"[B]~"=0")))+
+      facet_grid(~size_tot)
+    
+    ggsave(filename=paste0("boxplot_correlation_phylo_simul_1_",method,"_", correlation,"_partition_turnover_jaccard_size_correlation_A.pdf"), device=cairo_pdf, plot = last_plot(), width = 11, height = 7)
+    
+    
+    
+    ##  Resume for clade B
+    
+    results_signal$Inference <- "d) Not significant signal"
+    results_signal$Inference[which(results_signal$pvalue_high_B<0.05)] <- "e) Significant signal"
+    results_signal$Inference[intersect(which(results_signal$pvalue_high_B<0.05), which(results_signal$mantel_cor_B>0.05))] <- "f) Significant signal (R>0.05)"
+    results_signal$Inference[intersect(which(results_signal$pvalue_high_B<0.05), which(results_signal$mantel_cor_B>0.15))] <- "g) Significant signal (R>0.15)"
+    results_signal$Inference[which(results_signal$pvalue_low_B<0.05)] <- "c) Significant anti-signal"
+    results_signal$Inference[intersect(which(results_signal$pvalue_low_B<0.05), which(results_signal$mantel_cor_B<(-0.05)))] <- "b) Significant anti-signal (R<-0.05)"
+    results_signal$Inference[intersect(which(results_signal$pvalue_low_B<0.05), which(results_signal$mantel_cor_B<(-0.15)))] <- "a) Significant anti-signal (R<-0.15)"
+    
+    colors <- c()
+    if ("a) Significant anti-signal (R<-0.15)" %in% results_signal$Inference) {colors <- c(colors, "#943126")}
+    if ("b) Significant anti-signal (R<-0.05)" %in% results_signal$Inference) {colors <- c(colors, "#e74c3c")}
+    if ("c) Significant anti-signal" %in% results_signal$Inference) {colors <- c(colors, "#f1948a")}
+    if ("d) Not significant signal" %in% results_signal$Inference) {colors <- c(colors, "#f7dc6f")}
+    if ("e) Significant signal" %in% results_signal$Inference) {colors <- c(colors, "#7dcea0")}
+    if ("f) Significant signal (R>0.05)" %in% results_signal$Inference) {colors <- c(colors, "#27ae60")}
+    if ("g) Significant signal (R>0.15)" %in% results_signal$Inference) {colors <- c(colors, "#196f3d")}
+    
+    
+    results_signal_all <- results_signal %>% 
+      group_by(param,Inference,size_tot) %>% 
+      summarise(count=n()) %>% 
+      mutate(perc=count/sum(count))
+    
+    results_signal_all$size_tot <- as.factor(results_signal_all$size_tot)
+    results_signal_all$size_tot <-  factor(results_signal_all$size_tot,levels(results_signal_all$size_tot)[c(1,2,3)])
+    
+    ggplot(results_signal_all,aes(x=param, y = count))+  geom_bar(position="fill", stat="identity", alpha=0.7, aes(fill=Inference,color=Inference))+
+      xlab("Parameters")+ylab("Percentage of simulated networks") +labs(title=" ")+scale_fill_manual(values=colors)+transparent_theme_no + 
+      scale_y_continuous(breaks = brks, labels = scales::percent(brks)) +
+      scale_color_manual(values=colors)+
+      scale_x_discrete(labels = c(bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=1"),
+                                  bquote("   antagonism: \u03b1"[A]~"=-0.01; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.01; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.1"),
+                                  bquote("mutualism: \u03b1"[A]~"=1; \u03b1"[B]~"=0.01"),
+                                  bquote("mutualism: \u03b1"[A]~"=0.1; \u03b1"[B]~"=0.01"),
+                                  bquote("neutral: \u03b1"[A]~"=0; \u03b1"[B]~"=0")))+
+      facet_grid(~size_tot)
+    
+    ggsave(filename=paste0("boxplot_correlation_phylo_simul_1_",method,"_", correlation,"_partition_turnover_jaccard_size_correlation_B.pdf"), device=cairo_pdf, plot = last_plot(), width = 11, height = 7)
+    
+  }
+}
+
+#### Step 13-B: Simulate phylogenetic signal in generalism using degree and betadiv partitionning (simul 3) ####
+
+rm(list=ls())
+
+library(vegan)
+library(phytools)
+library(ggplot2)
+library(GUniFrac)
+
+library(parallel)
+require(R.utils)
+
+setwd("/Users/bperez/Nextcloud/Recherche/These/ISYEB/signal_phylo/simul_3/")
+
+source("../script/function_phylo_signal_network.R")
+dyn.load("../script/permute.so")
+
+library(mvMORPH)
+library(reshape2)
+
+seed=1
+
+# "param_1" d_A=1 
+# "param_2" d_A=0.5
+# "param_3" d_A=0.05 
+# "param_4" d_A=0
+
+correlation=FALSE # Pearson
+
+method="Jaccard_binary"
+
+for (method in c("Jaccard_binary")){
+  
+  results_signal <- c()
+  
+  for (param in paste0("param_",0:4)){
+    print(param)
+    
+    if (param=="param_0"){d_A=5  }
+    if (param=="param_1"){d_A=1  }
+    if (param=="param_2"){d_A=0.5  }
+    if (param=="param_3"){d_A=0.05}
+    if (param=="param_4"){d_A=0  }
+
+    
+    for (seed in 1:100){
+      
+      print(seed)
+      
+      # simulate phylogenies
+      
+      set.seed(seed)
+      nb_A <- floor(runif(1, 40, 150))
+      nb_B <- floor(runif(1, 40, 150))
+      
+      tree_A <- phytools::pbtree(n=nb_A)
+      tree_B <- phytools::pbtree(n=nb_B)
+      
+      # scale branch length
+      tree_A$edge.length <- tree_A$edge.length/max(node.depth.edgelength(tree_A))
+      tree_B$edge.length <- tree_B$edge.length/max(node.depth.edgelength(tree_B))
+      
+      # simulate OU with mean of 0 (theta=0), variance of 0.1 (noise of the brownian motion) and  a parameter of attraction toward 0, d (central tendency)
+      
+      if (d_A!="star"){
+        if (d_A!="0"){
+          data_A <- mvSIM(tree_A, param=list(sigma=0.1, alpha=d_A, ntraits=1, theta=0), model="OU1", nsim=1)
+        }else{ # brownian motion
+          data_A <- mvSIM(tree_A, param=list(sigma=0.1, ntraits=1, theta=0), model="BM1", nsim=1)
+        }
+      }else{
+        star_tree <- di2multi(pbtree(n=Ntip(tree_A)), tol = 10000000)
+        star_tree$edge.length <- rep(1,length(star_tree$edge.length))
+        data_A <- mvSIM( star_tree, param=list(sigma=0.1, alpha=1, ntraits=1, theta=0), model="OU1", nsim=1)
+      }
+      
+      data_A <- round( 1+(abs(data_A)-min(abs(data_A)))/(max(abs(data_A))-min(abs(data_A)))*(nb_B-1)) # new
+      
+      if (min(data_A)<1) { print("problem")}
+      
+      network <- matrix(0, nrow=Ntip(tree_B), ncol= Ntip(tree_A))
+      colnames(network) <- tree_A$tip.label
+      rownames(network) <- tree_B$tip.label
+      
+      for (i in 1:nrow(data_A)){
+        
+        network[sample(1:nrow(network), size = data_A[i], replace = F), rownames(data_A)[i]] <- 1
+        
+      }
+      
+      colSums(network)==data_A
+      rowSums(network)
+      
+      # Remove species if no interactions
+      network <- network[,colSums(network)>0]
+      network <- network[rowSums(network)>0,]
+      tree_B <- drop.tip(tree_B, tip=tree_B$tip.label[!tree_B$tip.label %in% rownames(network)])
+      tree_A <- drop.tip(tree_A, tip=tree_A$tip.label[!tree_A$tip.label %in% colnames(network)])
+      
+      
+      network <- network[tree_B$tip.label,tree_A$tip.label]
+      
+      # Ecological matrix
+      # binary Jaccard distances
+      if (method=="Jaccard_binary"){
+        jaccard_A <- as.matrix(vegan::vegdist(t(network), "jaccard", binary=T))
+        jaccard_B <- as.matrix(vegan::vegdist(network, "jaccard", binary=T))
+        eco_A <- jaccard_A
+        eco_B <- jaccard_B
+      }
+      
+      # Degree matrix 
+      network_binary <- network
+      network_binary[network_binary>0] <- 1 # makes binary
+      
+      # cophenetic distances
+      cophe_A <- cophenetic.phylo(tree_A)
+      cophe_B <- cophenetic.phylo(tree_B)
+      
+      # Mantel tests (Pearson)
+      mantel_A_partial <- ecodist::mantel(as.dist(cophe_A) ~ as.dist(eco_A) + dist(colSums(network_binary)),  nperm = 10000, mrank=F, nboot = 0) # Pearson
+      mantel_A_identity <- ecodist::mantel(as.dist(cophe_A) ~ as.dist(eco_A) ,  nperm = 10000, mrank=F, nboot = 0) # Pearson
+      mantel_A_degree <- ecodist::mantel(as.dist(cophe_A) ~ dist(colSums(network_binary)),  nperm = 10000, mrank=F, nboot = 0) # Pearson
+      
+      
+      
+      # Variance partionnning
+      ####  Need to be binary 
+      network[network>0] <- 1
+      
+      ### For A:
+      core <- betapart::betapart.core(t(network))
+      beta_div <- betapart::beta.pair(core, index.family="jaccard")
+      
+      ### Mantel test:
+      cophe_A <- cophenetic.phylo(tree_A)
+      turnover_A <- beta_div$beta.jtu
+      turnover_A <- as.matrix(turnover_A)
+      turnover_A <- turnover_A[rownames(cophe_A), colnames(cophe_A)]
+      
+      res_A_part <- ecodist::mantel(as.dist(cophe_A) ~ as.dist(turnover_A),  nperm = 10000, mrank=correlation, nboot = 0) 
+      
+      
+      # Mantel test (Pearson)
+      mantel_A_eco <- ecodist::mantel(as.dist(eco_A) ~ dist(colSums(network_binary)),  nperm = 10000, mrank=F, nboot = 0) 
+      
+      results_signal <- rbind(results_signal, c(param, seed, d_A, Ntip(tree_A), Ntip(tree_B), length(which(network>0))/(ncol(network)*nrow(network)) , round(mantel_A_partial[1:3],4), round(mantel_A_identity[1:3],4), round(mantel_A_degree[1:3],4), round(mantel_A_eco[1:3],4),  round(res_A_part[1:3],4)   )) 
+      
+    }}
+  
+  results_signal <- data.frame(results_signal)
+  
+  colnames(results_signal) <- c("param","seed","d_A", #"d_B", 
+                                "nb_A","nb_B","connectance",
+                                "partial_mantel_cor_A","partial_pvalue_high_A","partial_pvalue_low_A",
+                                "identity_mantel_cor_A","identity_pvalue_high_A","identity_pvalue_low_A",
+                                "degree_mantel_cor_A","degree_pvalue_high_A","degree_pvalue_low_A",
+                                "eco_mantel_cor_A","eco_pvalue_high_A","eco_pvalue_low_A",
+                                "part_mantel_cor_A","part_pvalue_high_A","part_pvalue_low_A") #,
+  
+  write.table(results_signal,paste0("results_generalism_partial_Mantel_test_degree_partionning_simul_3_new_simul_",method,".csv"), quote=F, sep=";",row.names=F)
+  
+  
+  hist(as.numeric(as.character(results_signal$partial_pvalue_high_A)))
+  hist(as.numeric(as.character(results_signal$identity_pvalue_high_A)))
+  hist(as.numeric(as.character(results_signal$degree_pvalue_high_A)))
+  
+  print(table(as.numeric(as.character(results_signal$partial_pvalue_high_A))<0.05))
+  print(table(as.numeric(as.character(results_signal$identity_pvalue_high_A))<0.05))
+  print(table(as.numeric(as.character(results_signal$degree_pvalue_high_A))<0.05))
+  
+}
+
+
+
+#### Plot results  #####
+
+
+rm(list=ls()) # on computer
+
+library(ggplot2)
+library(vegan)
+library(phytools)
+library(ggplot2)
+library(GUniFrac)
+library(parallel)
+require(R.utils)
+library(dplyr)
+brks <- c(0, 0.25, 0.5, 0.75, 1)
+
+setwd("/Users/bperez/Nextcloud/Recherche/These/ISYEB/signal_phylo/simul_3/")
+
+dyn.load("../script/permute.so")
+source("../script/function_phylo_signal_network.R")
+
+
+transparent_theme_no <- theme(panel.grid = element_blank(),
+                              axis.line = element_line("black"),
+                              panel.background = element_rect(fill = "transparent",colour = NA),
+                              plot.background = element_rect(fill = "transparent",colour = NA),
+                              legend.key=element_blank(),legend.background=element_blank(),
+                              axis.text.x = element_text(angle = 60, hjust = 1,size=8) ,
+                              axis.title=element_text(face="bold",family="Helvetica",size=10),axis.text=element_text(face="bold"), legend.text = element_text(face="bold"), legend.title = element_text(face="bold"))
+correlation="Pearson"
+
+method="GUniFrac"
+
+for (method in c("Jaccard_binary")){
+  
+  results_all <- read.table(paste0("results_generalism_partial_Mantel_test_degree_partionning_simul_3_new_simul_",method,".csv"), header=T,sep=";")
+  
+  
+  results_all$param <- as.character(results_all$param)
+  results_all$seed <- as.character(results_all$seed)
+  results_all$nb_A <- as.numeric(as.character(results_all$nb_A))
+  results_all$nb_B <- as.numeric(as.character(results_all$nb_B))
+  
+  
+  results_all$partial_mantel_cor_A <- as.numeric(as.character(results_all$partial_mantel_cor_A))
+  results_all$partial_pvalue_high_A <- as.numeric(as.character(results_all$partial_pvalue_high_A))
+  results_all$partial_pvalue_low_A <- as.numeric(as.character(results_all$partial_pvalue_low_A))
+  results_all$identity_mantel_cor_A <- as.numeric(as.character(results_all$identity_mantel_cor_A))
+  results_all$identity_pvalue_high_A <- as.numeric(as.character(results_all$identity_pvalue_high_A))
+  results_all$identity_pvalue_low_A <- as.numeric(as.character(results_all$identity_pvalue_low_A))
+  results_all$degree_mantel_cor_A <- as.numeric(as.character(results_all$degree_mantel_cor_A))
+  results_all$degree_pvalue_high_A <- as.numeric(as.character(results_all$degree_pvalue_high_A))
+  results_all$degree_pvalue_low_A <- as.numeric(as.character(results_all$degree_pvalue_low_A))
+  results_all$part_mantel_cor_A <- as.numeric(as.character(results_all$part_mantel_cor_A))
+  results_all$part_pvalue_high_A <- as.numeric(as.character(results_all$part_pvalue_high_A))
+  results_all$part_pvalue_low_A <- as.numeric(as.character(results_all$part_pvalue_low_A))
+  results_all$eco_mantel_cor_A <- as.numeric(as.character(results_all$eco_mantel_cor_A))
+  results_all$eco_pvalue_high_A <- as.numeric(as.character(results_all$eco_pvalue_high_A))
+  results_all$eco_pvalue_low_A <- as.numeric(as.character(results_all$eco_pvalue_low_A))
+  
+  
+  # Plot 
+  results_signal <- results_all
+  
+  results_signal$size_tot <- "<150"
+  results_signal$size_tot[which(results_signal$nb_A+results_signal$nb_B>=150)] <- "150-200"
+  results_signal$size_tot[which(results_signal$nb_A+results_signal$nb_B>200)] <- ">200"
+  
+  results_signal$size_tot <- as.factor(results_signal$size_tot)
+  results_signal$size_tot <-  factor(results_signal$size_tot,levels(results_signal$size_tot)[c(1,3,2)])
+  
+  
+  
+  test="simple_Mantel_test_part"
+  
+  # for tree A
+  results_signal$mantel_cor_A <- results_signal$part_mantel_cor_A
+  results_signal$pvalue_high_A <- results_signal$part_pvalue_high_A
+  results_signal$pvalue_low_A <- results_signal$part_pvalue_low_A
+  
+  results_signal$Inference <- "d) Not significant signal"
+  results_signal$Inference[which(results_signal$pvalue_high_A<0.05)] <- "e) Significant signal"
+  results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.05))] <- "f) Significant signal (R>0.05)"
+  results_signal$Inference[intersect(which(results_signal$pvalue_high_A<0.05), which(results_signal$mantel_cor_A>0.15))] <- "g) Significant signal (R>0.15)"
+  results_signal$Inference[which(results_signal$pvalue_low_A<0.05)] <- "c) Significant anti-signal"
+  results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.05)))] <- "b) Significant anti-signal (R<-0.05)"
+  results_signal$Inference[intersect(which(results_signal$pvalue_low_A<0.05), which(results_signal$mantel_cor_A<(-0.15)))] <- "a) Significant anti-signal (R<-0.15)"
+  
+  colors <- c()
+  if ("a) Significant anti-signal (R<-0.15)" %in% results_signal$Inference) {colors <- c(colors, "#943126")}
+  if ("b) Significant anti-signal (R<-0.05)" %in% results_signal$Inference) {colors <- c(colors, "#e74c3c")}
+  if ("c) Significant anti-signal" %in% results_signal$Inference) {colors <- c(colors, "#f1948a")}
+  if ("d) Not significant signal" %in% results_signal$Inference) {colors <- c(colors, "#f7dc6f")}
+  if ("e) Significant signal" %in% results_signal$Inference) {colors <- c(colors, "#7dcea0")}
+  if ("f) Significant signal (R>0.05)" %in% results_signal$Inference) {colors <- c(colors, "#27ae60")}
+  if ("g) Significant signal (R>0.15)" %in% results_signal$Inference) {colors <- c(colors, "#196f3d")}
+  
+  results_signal_all <- results_signal %>% 
+    group_by(param,Inference,size_tot) %>% 
+    summarise(count=n()) %>% 
+    mutate(perc=count/sum(count))
+  
+  ggplot(results_signal_all,aes(x=param, y = count))+  geom_bar(position="fill", stat="identity", alpha=0.7, aes(fill=Inference,color=Inference))+
+    xlab("Parameters")+ylab("Percentage of simulated networks") +labs(title=" ")+scale_fill_manual(values=colors)+transparent_theme_no + 
+    scale_y_continuous(breaks = brks, labels = scales::percent(brks)) +
+    scale_color_manual(values=colors)+
+    scale_x_discrete(labels = c(bquote(" a"[A]~"=5"),
+                                bquote(" a"[A]~"=1"),
+                                bquote(" a"[A]~"=0.5"),
+                                bquote(" a"[A]~"=0.05"),
+                                bquote(" a"[A]~"=0")))+
+    facet_grid(~size_tot)
+  
+  ggsave(filename=paste0("boxplot_new_simul_phylogenetic_signal_generalism_",test,"_simul_3_",method,"_", correlation,"_inference_size_tot_anticorrelation_clade_A.pdf"), device=cairo_pdf, plot = last_plot(), width = 8, height = 5)
+  
+
+  
+  print(method)
+
+  results_all_A_restricted <- results_all_A[which(results_all_A$degree_pvalue_high_A<0.05),]
+  
+  print("type I error (simple Mantel test):")
+  print(length(which(results_all_A$identity_pvalue_high_A<0.05))/nrow(results_all_A))
+  print(length(which(results_all_A_restricted$identity_pvalue_high_A<0.05))/nrow(results_all_A_restricted))
+  
+  print("type I error (partial Mantel test):")
+  print(length(which(results_all_A$partial_pvalue_high_A<0.05))/nrow(results_all_A))
+  print(length(which(results_all_A_restricted$partial_pvalue_high_A<0.05))/nrow(results_all_A_restricted))
+  
+  print("type I error (Mantel tests partitionning the turnover):")
+  print(length(which(results_all_A$part_pvalue_high_A<0.05))/nrow(results_all_A))
+  print(length(which(results_all_A_restricted$part_pvalue_high_A<0.05))/nrow(results_all_A_restricted))
+  
+}
+
+
+
+
+
+####  Step 14: Computation time for 10 networks at random  #####
+
+
+rm(list=ls())
+
+library(vegan)
+library(phytools)
+library(ggplot2)
+library(GUniFrac)
+library(RPANDA)
+library(parallel)
+require(R.utils)
+
+library(Matrix)
+library(phyr)
+
+
+setwd("/Users/bperez/Nextcloud/Recherche/These/ISYEB/signal_phylo/simul_1/compute_time/")
+
+source("../../script/function_phylo_signal_network.R")
+dyn.load("../../script/permute.so")
+
+
+
+list_networks <- c(paste0("simul_1_F_mutualism_5_seed_", 1:3),paste0("simul_1_F_antagonism_5_seed_", 1:4), paste0("simul_1_F_neutral_seed_", 1:3) )
+
+results <- c()
+for (name in list_networks){
+  
+  print(name)
+  network <- read.table(paste0("network_",name,".csv"), header=T,sep=";")
+  print(dim(network))
+  
+  colnames(network) <- seq(1:ncol(network))
+  rownames(network) <- seq(1:nrow(network))
+  
+  tree_A <- read.tree(paste0("network_tree_guild_A_",name,".tre"))
+  tree_B <- read.tree(paste0("network_tree_guild_B_",name,".tre"))
+  
+  print(method <- "Mantel Jaccard")
+  print(time_start <- as.numeric(Sys.time()))
+  output <- phylosignal_network(network, tree_A, tree_B,  method="Jaccard_weighted", permutation ="shuffle", nperm = 10000, correlation = "Pearson", only_A = FALSE)
+  print(time_stop <- as.numeric(Sys.time()))
+  results <- rbind(results, c(name,method,time_stop -time_start))
+
+  print(method <- "Mantel GUniFrac")
+  print(time_start <- as.numeric(Sys.time()))
+  output <- phylosignal_network(network, tree_A, tree_B,  method="GUniFrac", permutation ="shuffle", nperm = 10000, correlation = "Pearson", only_A = FALSE)
+  print(time_stop <- as.numeric(Sys.time()))
+  results <- rbind(results, c(name,method,time_stop -time_start))
+
+  print(method <- "Mantel Jaccard - nb partners")
+  print(time_start <- as.numeric(Sys.time()))
+  output <- phylosignal_network(network, tree_A, tree_B,  method="Jaccard_weighted", permutation ="nbpartners", nperm = 1000, correlation = "Pearson", only_A = FALSE)
+  print(time_stop <- as.numeric(Sys.time()))
+  results <- rbind(results, c(name,method,time_stop -time_start))
+  
+  print(method <- "Mantel GUniFrac - nb partners")
+  print(time_start <- as.numeric(Sys.time()))
+  output <- phylosignal_network(network, tree_A, tree_B,  method="GUniFrac", permutation ="nbpartners", nperm = 1000, correlation = "Pearson", only_A = FALSE)
+  print(time_stop <- as.numeric(Sys.time()))
+  results <- rbind(results, c(name,method,time_stop -time_start))
+  
+  print(method <- "PGLMM")
+  print(time_start <- as.numeric(Sys.time()))
+  d_all <- data.frame(cbind(rep(rownames(network),ncol(network)) , reshape2::melt(network)))
+  colnames(d_all) <- c("spB", "spA", "Y")
+  family <- "gaussian"
+  model2 <- pglmm(Y ~ 1 + (1|spA) + (1|spB),
+                  data = d_all, maxit=100, family=family)
+  model3 <- pglmm(Y ~ 1 + (1|spA__) + (1|spB),
+                  data = d_all, maxit=100, cov_ranef = list(spA = tree_A), family=family)
+  model4 <- pglmm(Y ~ 1 + (1|spA__) + (1|spB) + (1|spA__@spB),
+                  data = d_all, maxit=100, cov_ranef = list(spA = tree_A), family=family)
+  model5 <- pglmm(Y ~ 1 + (1|spA) + (1|spB__),
+                  data = d_all, maxit=100, cov_ranef = list(spB = tree_B), family=family)
+  model6 <- pglmm(Y ~ 1 + (1|spA) + (1|spB__) + (1|spB__@spA),
+                  data = d_all, maxit=100, cov_ranef = list(spB = tree_B), family=family)
+  print(time_stop <- as.numeric(Sys.time()))
+  results <- rbind(results, c(name,method,time_stop -time_start))
+
+  print(method <- "PBLM")
+  print(time_start <- as.numeric(Sys.time()))
+  output <- phylosignal_network(network, tree_A, tree_B,  method="PBLM", permutation ="shuffle")
+  print(time_stop <- as.numeric(Sys.time()))
+  results <- rbind(results, c(name,method,time_stop -time_start))
+
+}
+
+results <- data.frame(results)
+colnames(results) <- c("name",  "method", "time")
+
+results$time <- as.numeric(results$time)
+
+
+### Plot
+
+boxplot(results$time ~ results$method, log="y")
+
+
+pdf("computing_time.pdf", width=5, height=5)
+ggplot(results, aes(x=method, y=time))+geom_boxplot(fill="#633974", alpha=0.5)+theme_classic()+scale_y_continuous(trans='log10')+
+  theme(axis.text.x = element_text(angle = 60, hjust=1))+xlab("")+ylab("Computation time (in s)")
+dev.off()
+
+write.table(results, "running_times_simul_F.csv", sep=";")
+
+
+
+
+
+
+
+
+
