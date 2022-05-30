@@ -34,3 +34,6 @@ All the **scripts for generating such networks and for measuring the phylogeneti
 
 Finally, the example dataset of a mycorrhizal network between orchids and mycorrhizal fungi from La Réunion island (Martos et al., 2012) along with the reconstructed phylogenetic trees of the orchids and the fungi are available in the [R-package RPANDA](https://github.com/BPerezLamarque/Phylosignal_network) by loading `data(mycorrhizal_network)`.
 
+
+**Reference:** Benoît Perez-Lamarque, Odile Maliet, Benoît Pichon, Marc-André Selosse, Florent Martos, and Hélène Morlon,
+*Do closely related species interact with similar partners? Testing for phylogenetic signal in interaction networks*, bioRxiv, [doi: https://doi.org/10.1101/2021.08.30.458192](https://www.biorxiv.org/content/10.1101/2021.08.30.458192v3).
