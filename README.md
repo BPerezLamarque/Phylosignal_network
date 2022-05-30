@@ -38,7 +38,7 @@ install_github("hmorlon/PANDA",ref="Benoit_phylosignal", dependencies = TRUE)
 
 ```
 
-(NB: RPANDA requires mpfr to be installed. If not already installed on your computer, please visit the [mpfr help page](https://www.mpfr.org/mpfr-current/mpfr.html)  for installation). 
+(NB: RPANDA requires mpfr to be installed. If not already installed on your computer, you may get an error message. If so, please visit the [mpfr help page](https://www.mpfr.org/mpfr-current/mpfr.html) for installation). 
 
 # Measuring the phylogenetic signal:
 
