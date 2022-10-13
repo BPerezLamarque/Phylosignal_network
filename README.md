@@ -34,7 +34,7 @@ The functions are part of the R-package RPANDA and can be installed from GitHub 
 
 ```r
 library(devtools)
-install_github("hmorlon/PANDA",ref="Benoit_phylosignal", dependencies = TRUE)
+install_github("hmorlon/PANDA",ref="master", dependencies = TRUE)
 
 ```
 
