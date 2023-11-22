@@ -158,7 +158,7 @@ This first option uses the function  `phylosignal_sub_network` to  compute the c
 
 results_clade_A <- phylosignal_sub_network(network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=100000, minimum=10, degree=F)
 
-plot_phylosignal_sub_network(tree_A = tree_orchids, results_clade_A)
+plot_phylosignal_sub_network(tree_A = tree_orchids, results_clade_A, network)
 
 ```
 
@@ -209,6 +209,18 @@ The representation of the results using `plot_phylosignal_sub_network` is a phyl
     <b> Clade-specific phylogenetic signals in species interactions in the orchids. The only significant phylogenetic signal (orange dot; pvalue_upper_corrected<0.05  ) corresponds to the Angraecineae.</b>
 </p>
 
+
+
+<br> <br>
+
+```r
+# the same can be done for clade-specific phylogenetic signals in species interactions for fungi
+
+results_clade_B <- phylosignal_sub_network(t(network), tree_A = tree_fungi, tree_B = tree_orchids, method = "GUniFrac", correlation = "Pearson", nperm=100000, minimum=10, degree=F)
+
+plot_phylosignal_sub_network(tree_A = tree_fungi, results_clade_B, t(network))
+
+```
 
 <br> <br>
 
