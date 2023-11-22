@@ -75,6 +75,8 @@ tree_fungi <- mycorrhizal_network[[3]] # phylogenetic tree (phylo object)
     <b>Recommendations for measuring phylogenetic signals in species interactions.</b>
 </p>
 
+<br> <br>
+
 
 ##  Step 1: Testing for the phylogenetic signal in the species interactions
 
@@ -139,7 +141,6 @@ The output of  `phylosignal_network` in Step 2 has the same correlation values a
 For instance, if in Step 1 **pvalue_upper_A<0.05** and in  Step 2**pvalue_upper_A<0.05**, then we can conclude that there is a significant phylogenetic signal in species interactions that can not be fully explained by the phylogenetic signal in the number of partners. 
 Alternatively,  if in Step 1 **pvalue_upper_A<0.05** and in  Step 2**pvalue_upper_A>0.05**, then we cannot exclude that the  phylogenetic signal in species interactions observed in Step 1 is not explained by the phylogenetic signal in the number of partners.
 
-<br> <br>
 
 
 
