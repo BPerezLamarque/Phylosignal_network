@@ -9,7 +9,7 @@ This tutorial explains how to measure the phylogenetic signal in species interac
 
 
 **Citation:** Benoît Perez-Lamarque, Odile Maliet, Benoît Pichon, Marc-André Selosse, Florent Martos, and Hélène Morlon,
-*Do closely related species interact with similar partners? Testing for phylogenetic signal in interaction networks*, bioRxiv, [doi: https://doi.org/10.1101/2021.08.30.458192](https://www.biorxiv.org/content/10.1101/2021.08.30.458192v3).
+*Do closely related species interact with similar partners? Testing for phylogenetic signal in interaction networks*, Peer Community Journal, Volume 2 (2022), article no. e59, [doi: https://doi.org/10.24072/pcjournal.179](https://peercommunityjournal.org/articles/10.24072/pcjournal.179/).
 
 
 **Contact:** Benoît Perez-Lamarque, benoit.perez.lamarque@gmail.com
@@ -34,7 +34,7 @@ The functions are part of the R-package RPANDA and can be installed from GitHub 
 
 ```r
 library(devtools)
-install_github("hmorlon/PANDA",ref="master", dependencies = TRUE)
+install_github("hmorlon/PANDA", ref = "master", dependencies = TRUE)
 
 ```
 
@@ -84,7 +84,7 @@ This first step uses the function  `phylosignal_network` to compute the phylogen
 ```r
 
 # compute phylogenetic signals in species interactions
-phylosignal_network(network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=10000)
+phylosignal_network(network = network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm = 10000)
 
 ```
 
@@ -119,7 +119,7 @@ If there is a significant phylogenetic signal in Step 1, this second first step 
 ```r
 
 # compute phylogenetic signals in species interactions with permutations keeping constant the number fo partners 
-phylosignal_network(network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=1000, permutations="nbpartners")
+phylosignal_network(network = network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm = 1000, permutations = "nbpartners")
 
 ```
 
@@ -156,7 +156,7 @@ This first option uses the function  `phylosignal_sub_network` to  compute the c
 ```r
 # compute clade-specific phylogenetic signals in species interactions for orchids
 
-results_clade_A <- phylosignal_sub_network(network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm=100000, minimum=10, degree=F)
+results_clade_A <- phylosignal_sub_network(network = network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm = 100000, minimum = 10, degree = FALSE)
 
 plot_phylosignal_sub_network(tree_A = tree_orchids, results_sub_clades = results_clade_A, network = network)
 
@@ -173,7 +173,7 @@ plot_phylosignal_sub_network(tree_A = tree_orchids, results_sub_clades = results
 | `correlation` | indicates which correlation to use in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
 | `nperm` | indicates the number of permutations to evaluate the significance of the Mantel test.  |
 | `minimum` | indicates the minimal number of descending species for a node in tree A to compute its clade-specific phylogenetic signal.  |
-| `degree` | if  `degree=TRUE `, Mantel tests testing for phylogenetic signal in the number of partners are additionally performed in each sub-clade.|
+| `degree` | if  `degree = TRUE `, Mantel tests testing for phylogenetic signal in the number of partners are additionally performed in each sub-clade.|
     
 <br> <br>
 
@@ -218,7 +218,7 @@ The representation of the results using `plot_phylosignal_sub_network` is a phyl
 ```r
 # the same can be done for clade-specific phylogenetic signals in species interactions for fungi
 
-results_clade_B <- phylosignal_sub_network(t(network), tree_A = tree_fungi, tree_B = tree_orchids, method = "GUniFrac", correlation = "Pearson", nperm=100000, minimum=10, degree=F)
+results_clade_B <- phylosignal_sub_network(network = t(network), tree_A = tree_fungi, tree_B = tree_orchids, method = "GUniFrac", correlation = "Pearson", nperm = 100000, minimum = 10, degree = FALSE)
 
 plot_phylosignal_sub_network(tree_A = tree_fungi, results_sub_clades = results_clade_B, network = t(network))
 
@@ -230,7 +230,7 @@ plot_phylosignal_sub_network(tree_A = tree_fungi, results_sub_clades = results_c
 
 ## Option 2: Test the robustness of the findings to phylogenetic uncertainty and/or sampling bias
 
-This can be achieved by testing the robustness of the results to phylogenetic uncertainty (*e.g.* using a Bayesian tree posterior) or sampling bias (by subsampling over-represented species/clades). See [Perez-Lamarque *et al.* (*in prep.*)](https://www.biorxiv.org/content/10.1101/2021.08.30.458192v1) for more details.
+This can be achieved by testing the robustness of the results to phylogenetic uncertainty (*e.g.* using a Bayesian tree posterior) or sampling bias (by subsampling over-represented species/clades). See [Perez-Lamarque *et al.* (2022)](https://peercommunityjournal.org/articles/10.24072/pcjournal.179/) for more details.
 
 
 <br> <br>
@@ -253,7 +253,7 @@ This  step uses the function  `phylosignal_network` to compute the phylogenetic 
 ```r
 
 # compute the phylogenetic signal in the number of partners for orchids 
-phylosignal_network(network, tree_A = tree_orchids, method = "degree", correlation = "Pearson", nperm=10000)
+phylosignal_network(network = network, tree_A = tree_orchids, method = "degree", correlation = "Pearson", nperm = 10000)
 
 
 ```
