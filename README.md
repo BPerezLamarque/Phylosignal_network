@@ -40,6 +40,9 @@ install_github("hmorlon/PANDA", ref = "master", dependencies = TRUE)
 
 (NB: RPANDA requires mpfr to be installed. If not already installed on your computer, you may get an error message. If so, please visit the [mpfr help page](https://www.mpfr.org/mpfr-current/mpfr.html) for installation). 
 
+<br> <br>
+
+
 # Measuring the phylogenetic signal:
 
 
@@ -277,6 +280,9 @@ The output of  `phylosignal_network` is then:
 which corresponds to the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), and the Mantel correlation between phylogenetic distances and degree difference distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_upper_A**, *i.e.* the fraction of permutations that led to higher correlation values), and its associated lower p-value (**pvalue_lower_A**, *i.e.* the fraction of permutations that led to lower correlation values).
 
 Here, **pvalue_upper_A>0.05**, so we do not detect any significant phylogenetic signal in the number of partners for the orchids. 
+
+
+<br> <br>
 
 
 
