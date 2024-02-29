@@ -30,9 +30,13 @@ This tutorial explains how to measure the phylogenetic signal in species interac
 # Installation:
 
 
-The functions are part of the R-package RPANDA and can be installed from GitHub using devtools:
+The functions are part of the R-package RPANDA:
 
 ```r
+
+install.packages("RPANDA")
+
+# Alternatively, it and can be installed from GitHub using devtools
 library(devtools)
 install_github("hmorlon/PANDA", ref = "master", dependencies = TRUE)
 
