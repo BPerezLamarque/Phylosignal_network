@@ -5,17 +5,17 @@
 
 
 
-This tutorial explains how to measure the phylogenetic signal in species interactions in a bipartite ecological network using the R-package RPANDA (Morlon *et al.*, 2016), *i.e.* how to test whether closely related species interact with similar partners.
+This tutorial explains how to measure the phylogenetic signal in species interactions in a bipartite ecological network using the <a href="https://github.com/BPerezLamarque/EVOLI">R-package EVOLI</a>, *i.e.* how to test whether closely related species interact with similar partners.
 
 
 **Citation:** Benoît Perez-Lamarque, Odile Maliet, Benoît Pichon, Marc-André Selosse, Florent Martos, and Hélène Morlon,
 *Do closely related species interact with similar partners? Testing for phylogenetic signal in interaction networks*, Peer Community Journal, Volume 2 (2022), article no. e59, [doi: https://doi.org/10.24072/pcjournal.179](https://peercommunityjournal.org/articles/10.24072/pcjournal.179/).
 
 
-**Contact:** Benoît Perez-Lamarque, benoit.perez.lamarque@gmail.com
+**Contact:** Benoît Perez-Lamarque, benoit.perez-lamarque@utoulouse.fr
 
 
-**Simulations:** Simulations used to investigate the performances of the different approaches measuring the phylogenetic signal in species interactions in bipartite interaction networks are available in the folder [simulations](https://github.com/BPerezLamarque/Phylosignal_network/tree/master/simulations). Functions to simulate the BipartiteEvol interaction networks are available in RPANDA, while the script used to simulate interaction networks with a phylogenetic signal in the number of partners (and not their identity) can be found [here](https://github.com/BPerezLamarque/Phylosignal_network/blob/master/simulations/script/sim_signal_number_partners.R).
+**Simulations:** Simulations used to investigate the performances of the different approaches measuring the phylogenetic signal in species interactions in bipartite interaction networks are available in the folder [simulations](https://github.com/BPerezLamarque/Phylosignal_network/tree/master/simulations). Functions to simulate the BipartiteEvol interaction networks are available in RPANDA (Morlon et al. 2016), while the script used to simulate interaction networks with a phylogenetic signal in the number of partners (and not their identity) can be found [here](https://github.com/BPerezLamarque/Phylosignal_network/blob/master/simulations/script/sim_signal_number_partners.R).
 
 
 # Contents:
@@ -34,15 +34,13 @@ The functions are part of the R-package RPANDA:
 
 ```r
 
-install.packages("RPANDA")
+install.packages("EVOLI")
 
 # Alternatively, it and can be installed from GitHub using devtools
 library(devtools)
-install_github("hmorlon/PANDA", ref = "master", dependencies = TRUE)
+install_github("BPerezLamarque/EVOLI", dependencies = TRUE)
 
 ```
-
-(NB: RPANDA requires mpfr to be installed. If not already installed on your computer, you may get an error message. If so, please visit the [mpfr help page](https://www.mpfr.org/mpfr-current/mpfr.html) for installation). 
 
 <br> <br>
 
@@ -62,7 +60,7 @@ First, you can load the example dataset of a mycorrhizal network between orchids
 
 
 ```r
-library(RPANDA)
+library(EVOLI)
 
 data(mycorrhizal_network)
 
@@ -244,12 +242,18 @@ This can be achieved by testing the robustness of the results to phylogenetic un
 <br> <br>
 
 
+## Option 3: Assess the effect of biogeography on the phylogenetic signal in species interactions
+
+This can be using biogeography-based permutations that only shuffle species that co-occur on the same area. <a href="https://github.com/BPerezLamarque/Scripts/tree/master/Biogeography_interactions">See the complete tutorial here.</a> (citation: Ibos et al., 2026, in prep.) 
+
+
+
+<br> <br>
+
 
 
 
 # Other possibilities:
-
-
 
 
 
