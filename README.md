@@ -1,5 +1,5 @@
 
-**Guidelines to measure the phylogenetic signal in a bipartite interaction network:**
+**Guidelines to measure phylogenetic signal in a bipartite interaction network:**
 ====
 
 
