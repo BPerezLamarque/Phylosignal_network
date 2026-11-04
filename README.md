@@ -30,7 +30,7 @@ This tutorial explains how to measure the phylogenetic signal in species interac
 # Installation:
 
 
-The functions are part of the R-package RPANDA:
+The functions are part of the R-package EVOLI:
 
 ```r
 
@@ -41,6 +41,8 @@ library(devtools)
 install_github("BPerezLamarque/EVOLI", dependencies = TRUE)
 
 ```
+
+They are also part of the R-package RPANDA (Morlon et al., 2016).
 
 <br> <br>
 
