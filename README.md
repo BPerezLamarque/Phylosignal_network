@@ -244,14 +244,6 @@ This can be achieved by testing the robustness of the results to phylogenetic un
 <br> <br>
 
 
-## Option 3: Assess the effect of biogeography on the phylogenetic signal in species interactions
-
-This can be using biogeography-based permutations that only shuffle species that co-occur on the same area. <a href="https://github.com/BPerezLamarque/Scripts/tree/master/Biogeography_interactions">See the complete tutorial here.</a> (citation: Ibos et al., 2026, in prep.) 
-
-
-
-<br> <br>
-
 
 
 
@@ -290,6 +282,14 @@ The output of  `phylosignal_network` is then:
 which corresponds to the number of orchid species (**nb_A**), the number of fungal species (**nb_B**), and the Mantel correlation between phylogenetic distances and degree difference distances for orchids (**mantel_cor_A**), its associated upper p-value (**pvalue_upper_A**, *i.e.* the fraction of permutations that led to higher correlation values), and its associated lower p-value (**pvalue_lower_A**, *i.e.* the fraction of permutations that led to lower correlation values).
 
 Here, **pvalue_upper_A>0.05**, so we do not detect any significant phylogenetic signal in the number of partners for the orchids. 
+
+
+<br> <br>
+
+## Assessing the effect of biogeography on the phylogenetic signal in species interactions
+
+This can be done using biogeography-based permutations that only shuffle species that co-occur on the same area. <a href="https://github.com/BPerezLamarque/Scripts/tree/master/Biogeography_interactions">See the complete tutorial here.</a> (citation: Ibos et al., 2026, in prep.) 
+
 
 
 <br> <br>
