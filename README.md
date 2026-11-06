@@ -167,7 +167,7 @@ This first option uses the function  `phylosignal_sub_network` to  compute the c
 
 results_clade_A <- phylosignal_sub_network(network = network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm = 100000, minimum = 10, degree = FALSE)
 
-plot_phylosignal_sub_network(tree_A = tree_orchids, results_sub_clades = results_clade_A, network = network)
+plot_phylosignal_sub_network(tree_A = tree_orchids, results_sub_clades = results_clade_A, network = network, where = "topleft")
 
 
 
@@ -229,7 +229,7 @@ The representation of the results using `plot_phylosignal_sub_network` is a phyl
 
 results_clade_B <- phylosignal_sub_network(network = t(network), tree_A = tree_fungi, tree_B = tree_orchids, method = "GUniFrac", correlation = "Pearson", nperm = 100000, minimum = 10, degree = FALSE)
 
-plot_phylosignal_sub_network(tree_A = tree_fungi, results_sub_clades = results_clade_B, network = t(network))
+plot_phylosignal_sub_network(tree_A = tree_fungi, results_sub_clades = results_clade_B, network = t(network), where = "topleft")
 
 ```
 
@@ -299,7 +299,7 @@ This can be done using biogeography-based permutations that only shuffle species
 
 ##  Using the PBLM approach
 
-Using the function  `phylosignal_network`, you can also apply the approach PBLM (Ives and Godfray, 2006) by specifying  `method="PBLM"`. However, given the very frequent false positives of this approach when testing for phylogenetic signals in species interactions, this is discouraged.
+Using the function  `phylosignal_network` available in the R-package RPANDA (but not in EVOLI), you can also apply the approach PBLM (Ives and Godfray, 2006) by specifying  `method="PBLM"`. However, given the very frequent false positives of this approach when testing for phylogenetic signals in species interactions (Perez-Lamarque et al. 2022), this is discouraged.
 
 
 
