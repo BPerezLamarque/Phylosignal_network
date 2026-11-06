@@ -129,7 +129,7 @@ If there is a significant phylogenetic signal in Step 1, this second first step 
 ```r
 
 # compute phylogenetic signals in species interactions with permutations keeping constant the number fo partners 
-phylosignal_network(network = network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm = 1000, permutations = "nbpartners")
+phylosignal_network(network = network, tree_A = tree_orchids, tree_B = tree_fungi, method = "GUniFrac", correlation = "Pearson", nperm = 1000, permutation = "nbpartners")
 
 ```
 
@@ -141,7 +141,7 @@ phylosignal_network(network = network, tree_A = tree_orchids, tree_B = tree_fung
 | `method` | indicates which method to use to compute the phylogenetic signal in species interactions: you can choose "Jaccard_weighted" for computing ecological distances using Jaccard dissimilarities (or "Jaccard_binary" to not take into account the abundances of the interactions), or "GUniFrac" to compute the weighted (or generalized) UniFrac distances (or "UniFrac_unweighted" to not take into account the interaction abundances). |
 | `correlation` |indicates which correlation to use in the Mantel test, among the Pearson, Spearman, or Kendall correlations. |
 | `nperm` | indicates the number of permutations to evaluate the significance of the Mantel test.  |
-| `permutations` | indicates which permutations to compute either "shuffle" (*i.e.* random shuffling of the distance matrix, as in a regular Mantel test) or "nbpartners" (*i.e.* keeping constant the number of partners per species and shuffling at random their identity).  |
+| `permutation` | indicates which permutations to compute either "shuffle" (*i.e.* random shuffling of the distance matrix, as in a regular Mantel test) or "nbpartners" (*i.e.* keeping constant the number of partners per species and shuffling at random their identity).  |
 
 <br> <br>
 
