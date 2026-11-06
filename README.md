@@ -36,9 +36,10 @@ The functions are part of the R-package EVOLI:
 
 install.packages("EVOLI")
 
-# Alternatively, it and can be installed from GitHub using devtools
-library(devtools)
-install_github("BPerezLamarque/EVOLI", dependencies = TRUE)
+# Alternatively, it and can be installed from GitHub:
+
+library(pak)
+pak::pak("BPerezLamarque/EVOLI", dependencies = TRUE)
 
 ```
 
